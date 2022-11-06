@@ -7,7 +7,6 @@ Program ex_original
     real(kind=8) :: alpha,epsilon,delta,sigmin,fobj,aux,fxk,fxtrial,gaux,ti,norm_grad
     real(kind=8), allocatable :: xtrial(:),faux(:),indices(:),nu_l(:),nu_u(:),opt_cond(:),delta_grid(:),sigmin_grid(:),xstar(:)
     integer, allocatable :: Idelta(:)
-    logical :: box
 
     ! COMMON INTEGERS
     integer :: samples,q 
@@ -34,8 +33,8 @@ Program ex_original
     real(kind=8),   pointer :: l(:),u(:),x(:)
 
     ! Set parameters
-    n = 5
-    samples = 46
+    n = 4
+    samples = 16
     alpha = 0.5d0
     epsilon = 1.0d-3
     size_delta_grid = 5
@@ -50,7 +49,7 @@ Program ex_original
         stop
     end if
   
-    call read_data()
+    call gen_data()
 
     ! Coded subroutines
 
@@ -81,74 +80,56 @@ Program ex_original
     nvparam   = 1
     vparam(1) = 'ITERATIONS-OUTPUT-DETAIL 0' 
 
-    ! Box-constrained? 
-    box = .true. 
+    l(1:n) = -1.0d+20
+    u(1:n) = 1.0d+20
 
-    if (box .eqv. .false.) then
-        l(1:n) = -1.0d+20
-        u(1:n-1) = 1.0d+20
-        u(n) = 0.0d0
-    else
-        l(1) = -10.0d0
-        l(2) = -10.0d0
-        l(3) = -10.0d0
-        l(4) = -10.0d0
-        l(5) = -1.0d+20
+    ! ! Discretization of delta and sigmin
+    ! do i = 1, size_delta_grid
+    !     delta_grid(i) = 10.d0**(-i+1)
+    ! end do
 
-        u(1) = 10.0d0
-        u(2) = 10.0d0
-        u(3) = 10.0d0
-        u(4) = 10.0d0
-        u(5) = 0.0d0
-    endif
+    ! do i = 1, size_sigmin_grid
+    !     sigmin_grid(i) = 10.d0**(-i+3)
+    ! end do
 
-    ! Discretization of delta and sigmin
-    do i = 1, size_delta_grid
-        delta_grid(i) = 10.d0**(-i+1)
-    end do
+    ! ! "Heuristics"
+    ! q = samples - 10
 
-    do i = 1, size_sigmin_grid
-        sigmin_grid(i) = 10.d0**(-i+3)
-    end do
+    ! do i = 1, size_delta_grid
+    !     do j = 1, size_sigmin_grid
+    !         if (i + j .eq. 2) then
+    !             call ovo_algorithm(delta_grid(1),sigmin_grid(1),fobj,norm_grad)
+    !             optind_delta = i
+    !             optind_sigmin = j
+    !         else 
+    !             call ovo_algorithm(delta_grid(i),sigmin_grid(j),aux,norm_grad)
+    !             if (aux .lt. fobj) then
+    !                 fobj = aux
+    !                 optind_delta = i
+    !                 optind_sigmin = j
+    !                 xstar(:) = xk(:)
+    !             end if
+    !         end if
+    !     end do
+    ! end do
 
-    ! "Heuristics"
-    q = samples - 10
+    ! delta = delta_grid(optind_delta)
+    ! sigmin = sigmin_grid(optind_sigmin)
 
-    do i = 1, size_delta_grid
-        do j = 1, size_sigmin_grid
-            if (i + j .eq. 2) then
-                call ovo_algorithm(delta_grid(1),sigmin_grid(1),fobj,norm_grad)
-                optind_delta = i
-                optind_sigmin = j
-            else 
-                call ovo_algorithm(delta_grid(i),sigmin_grid(j),aux,norm_grad)
-                if (aux .lt. fobj) then
-                    fobj = aux
-                    optind_delta = i
-                    optind_sigmin = j
-                    xstar(:) = xk(:)
-                end if
-            end if
-        end do
-    end do
+    ! Open(Unit = 100, File = "output/table_severalq.txt", ACCESS = "SEQUENTIAL")
 
-    delta = delta_grid(optind_delta)
-    sigmin = sigmin_grid(optind_sigmin)
+    ! do q = 30, 40
+    !     call ovo_algorithm(delta_grid(optind_delta),sigmin_grid(optind_sigmin),fobj,norm_grad)
+    !     print*, q, xk, fobj, norm_grad
+    !     write(100,10) q,'&',xk(1),'&',xk(2),'&',xk(3),'&',xk(4),'&',fobj,'&',n_iter,'\\'
+    !     10 format (I2,1X,A1,1X,F10.6,1X,A1,1X,F10.6,1X,A1,1X,F10.6,1X,A1,1X,F10.6,1X,A1,1X,F10.6,1X,A1,1X,I3,1X,A2)
+    ! end do
 
-    Open(Unit = 100, File = "output/table_severalq.txt", ACCESS = "SEQUENTIAL")
+    ! close(100)
 
-    do q = 30, 40
-        call ovo_algorithm(delta_grid(optind_delta),sigmin_grid(optind_sigmin),fobj,norm_grad)
-        print*, q, xk, fobj, norm_grad
-        write(100,10) q,'&',xk(1),'&',xk(2),'&',xk(3),'&',xk(4),'&',fobj,'&',n_iter,'\\'
-        10 format (I2,1X,A1,1X,F10.6,1X,A1,1X,F10.6,1X,A1,1X,F10.6,1X,A1,1X,F10.6,1X,A1,1X,F10.6,1X,A1,1X,I3,1X,A2)
-    end do
+    ! print*,xstar
 
-    close(100)
-
-    print*,xstar
-
-    call export(xstar)
+    ! call export(xstar)
 
     CONTAINS
 
@@ -336,24 +317,6 @@ Program ex_original
             end if
         end do
 
-        ! do i = q, samples
-        !     if (abs(fq - f(i)) .le. delta) then
-        !         m = m + 1
-        !         Idelta(m) = int(indices(i))
-        !     else
-        !         exit
-        !     end if
-        ! end do
-
-        ! do i = q-1, 1, -1
-        !     if (abs(fq - f(i)) .le. delta) then
-        !         m = m + 1
-        !         Idelta(m) = int(indices(i))
-        !     else
-        !         exit
-        !     end if
-        ! end do
-
     end subroutine
 
     !==============================================================================
@@ -388,19 +351,19 @@ Program ex_original
     !==============================================================================
     ! READ THE DATA
     !==============================================================================
-    subroutine read_data()
+    subroutine gen_data()
         implicit none
 
         integer :: i
 
-        Open(Unit = 10, File = "output/original.txt", ACCESS = "SEQUENTIAL")
-
         do i = 1, samples
-            read(10,*) t(i), y(i)
+            t(i) = 45 + i * 5
         enddo
 
-        close(10)
-    end subroutine read_data
+        y(1:samples) = (/34780.d0,28610.d0,23650.d0,19630.d0,16370.d0,13720.d0,11540.d0,9744.d0,&
+                    8261.d0,7030.d0,6005.d0,5147.d0,4427.d0,3820.d0,3307.d0,2872.d0/)
+
+    end subroutine gen_data
 
     !==============================================================================
     ! SUBROUTINES FOR ALGENCAN
