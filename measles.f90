@@ -48,8 +48,13 @@ Program ex_original
         write(*,*) 'Allocation error in main program'
         stop
     end if
-  
-    call gen_data()
+
+    t(1:15) = (/(i, i = 1,15)/)
+    t(16:25) = (/(2 * i + 1, i = 8, 17)/)
+
+    print*, t
+
+    stop
 
     ! Coded subroutines
 
@@ -235,20 +240,7 @@ Program ex_original
             opt_cond(:) = 0.0d0
             nu_l(:) = 0.0d0
             nu_u(:) = 0.0d0
-    
-            if (box .eqv. .true.) then
-                do j = 1, n-1
-                    if (xtrial(j) .le. l(j)) then 
-                        do i = 1, m
-                            nu_l(j) = nu_l(j) + lambda(i) * grad(i,j)
-                        end do
-                    else if (xtrial(j) .ge. u(j)) then
-                        do i = 1, m
-                            nu_u(j) = nu_u(j) - lambda(i) * grad(i,j)
-                        end do
-                    end if
-                end do
-            end if
+            
     
             do i = 1, m
                 opt_cond(:) = opt_cond(:) + lambda(i) * grad(i,:)
@@ -347,23 +339,6 @@ Program ex_original
         res = x(1) + x(2) * t(i) + x(3) * (t(i)**2) + x(4) * (t(i)**3)
 
     end function model
-
-    !==============================================================================
-    ! READ THE DATA
-    !==============================================================================
-    subroutine gen_data()
-        implicit none
-
-        integer :: i
-
-        do i = 1, samples
-            t(i) = 45 + i * 5
-        enddo
-
-        y(1:samples) = (/34780.d0,28610.d0,23650.d0,19630.d0,16370.d0,13720.d0,11540.d0,9744.d0,&
-                    8261.d0,7030.d0,6005.d0,5147.d0,4427.d0,3820.d0,3307.d0,2872.d0/)
-
-    end subroutine gen_data
 
     !==============================================================================
     ! SUBROUTINES FOR ALGENCAN
