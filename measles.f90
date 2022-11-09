@@ -3,24 +3,12 @@ Program ex_original
 
     implicit none 
     
-    integer :: allocerr,i,j,k,size_delta_grid,size_sigmin_grid,optind_delta,optind_sigmin,n_iter,n_int_iter
-    real(kind=8) :: alpha,epsilon,delta,sigmin,fobj,aux,fxk,fxtrial,gaux,ti,norm_grad
-    real(kind=8), allocatable :: xtrial(:),faux(:),indices(:),nu_l(:),nu_u(:),opt_cond(:),delta_grid(:),sigmin_grid(:),xstar(:)
-    integer, allocatable :: Idelta(:)
-
-    ! COMMON INTEGERS
-    integer :: samples,q 
-
-    ! COMMON SCALARS
-    real(kind=8) :: sigma
-
-    ! COMMON ARRAYS
-    real(kind=8),   pointer :: t(:),y(:),grad(:,:),xk(:)
-
-    ! COMMON BLOCKS
-    common /integerData/ samples,q
-    common /scalarData/ sigma
-    common /vectorData/ t,y,xk,grad
+    integer :: allocerr,i,j,k,size_delta_grid,size_sigmin_grid,optind_delta,optind_sigmin,&
+               n_iter,n_int_iter,samples,q 
+    real(kind=8) :: alpha,epsilon,delta,sigmin,fobj,aux,fxk,fxtrial,gaux,ti,norm_grad,sigma
+    real(kind=8), allocatable :: xtrial(:),faux(:),indices(:),nu_l(:),nu_u(:),opt_cond(:),&
+                                 delta_grid(:),sigmin_grid(:),xstar(:),xk(:),grad(:,:),y(:)
+    integer, allocatable :: Idelta(:),t(:)
 
     ! LOCAL SCALARS
     logical :: checkder
@@ -32,9 +20,12 @@ Program ex_original
     logical :: coded(11)
     real(kind=8),   pointer :: l(:),u(:),x(:)
 
+    ! Reading data and storing it in the variables t and y
+    Open(Unit = 100, File = "output/measles.txt", ACCESS = "SEQUENTIAL")
+
     ! Set parameters
+    read(100,*) samples
     n = 4
-    samples = 16
     alpha = 0.5d0
     epsilon = 1.0d-3
     size_delta_grid = 5
@@ -49,12 +40,11 @@ Program ex_original
         stop
     end if
 
-    t(1:15) = (/(i, i = 1,15)/)
-    t(16:25) = (/(2 * i + 1, i = 8, 17)/)
+    do i = 1, samples
+        read(100,*) t(i), y(i)
+    enddo
 
-    print*, t
-
-    stop
+    close(100)
 
     ! Coded subroutines
 
@@ -136,6 +126,8 @@ Program ex_original
 
     ! call export(xstar)
 
+    call ovo_algorithm(0.1d0,1.d0,fobj,norm_grad)
+
     CONTAINS
 
     !==============================================================================
@@ -153,8 +145,9 @@ Program ex_original
         integer, parameter  :: max_iter = 10000, max_iter_sub = 1000, kflag = 2
         integer             :: iter,iter_sub,i,j
 
+
         ! Initial solution
-        xk(:) = (/-1.0d0,-2.0d0,1.0d0,-1.0d0/)
+        xk(:) = 1.d0
 
         iter = 0
     
@@ -162,110 +155,20 @@ Program ex_original
     
         ! Scenarios
         do i = 1, samples
-            faux(i) = fi(xk,i,n)
+            call fi(xk,i,n,faux(i))
         end do
     
         ! Sorting
         call DSORT(faux,indices,samples,kflag)
     
-        ! q-Order-Value function 
-        fxk = faux(q)
+        ! ! q-Order-Value function 
+        ! fxk = faux(q)
     
-        call mount_Idelta(faux,indices,delta,Idelta,m)
+        ! call mount_Idelta(faux,indices,delta,Idelta,m)
 
         n_iter = 0
-        n_int_iter = 0
-    
-        do
-            iter = iter + 1
-    
-            allocate(equatn(m),linear(m),lambda(m),grad(m,n-1),stat=allocerr)
-    
-            if ( allocerr .ne. 0 ) then
-                write(*,*) 'Allocation error in main program'
-                stop
-            end if
-    
-            equatn(:) = .false.
-            linear(:) = .false.
-            lambda(:) = 0.0d0
-    
-            do i = 1, m
-                ti = t(Idelta(i))
-                gaux = model(xk,Idelta(i),n) - y(Idelta(i))
-    
-                grad(i,1) = 1.0d0
-                grad(i,2) = ti
-                grad(i,3) = ti**2
-                grad(i,4) = ti**3
-    
-                grad(i,:) = gaux * grad(i,:)
-            end do
-    
-            sigma = sigmin
-    
-            iter_sub = 1
-            x(:) = (/xk(:),0.0d0/)
-    
-            ! Minimizing using ALGENCAN
-            do 
-                call algencan(myevalf,myevalg,myevalh,myevalc,myevaljac,myevalhc,   &
-                    myevalfc,myevalgjac,myevalgjacp,myevalhl,myevalhlp,jcnnzmax,    &
-                    hnnzmax,epsfeas,epsopt,efstain,eostain,efacc,eoacc,outputfnm,   &
-                    specfnm,nvparam,vparam,n,x,l,u,m,lambda,equatn,linear,coded,    &
-                    checkder,f,cnorm,snorm,nlpsupn,inform)
-    
-                xtrial(1:n-1) = x(1:n-1)
-    
-                indices(:) = (/(i, i = 1, samples)/)
-    
-                ! Scenarios
-                do i = 1, samples
-                    faux(i) = fi(xtrial,i,n)
-                end do
-    
-                ! Sorting
-                call DSORT(faux,indices,samples,kflag)
-        
-                fxtrial = faux(q)
-        
-                ! Test the sufficient descent condition
-                if (fxtrial .le. (fxk - alpha * norm2(xtrial(1:n-1) - xk(1:n-1))**2)) exit
-                if (iter_sub .ge. max_iter_sub) exit
-    
-                sigma = 2.0d0 * sigma
-                iter_sub = iter_sub + 1
-            end do ! End of internal iterations
-    
-            opt_cond(:) = 0.0d0
-            nu_l(:) = 0.0d0
-            nu_u(:) = 0.0d0
-            
-    
-            do i = 1, m
-                opt_cond(:) = opt_cond(:) + lambda(i) * grad(i,:)
-            enddo
-    
-            opt_cond(:) = opt_cond(:) + nu_u(:) - nu_l(:)
-            ! opt_cond(:) = xtrial(:) - xk(:)
-    
-            ! print*, iter, iter_sub, fxtrial, norm2(opt_cond), m
-    
-            if (norm2(opt_cond) .lt. epsilon) exit
-            if (iter .ge. max_iter) exit
-    
-            deallocate(lambda,equatn,linear,grad)
-            
-            xk(1:n-1) = xtrial(1:n-1)
-            fxk = fxtrial
-            n_iter = iter
-    
-            call mount_Idelta(faux,indices,delta,Idelta,m)
-    
-        end do ! End of Main Algorithm
 
-        fobj = fxtrial
-        norm_grad = norm2(opt_cond)
+        
     end subroutine
 
     !==============================================================================
@@ -276,12 +179,11 @@ Program ex_original
 
         real(kind=8),   intent(in) :: xsol(n-1)
 
-        Open(Unit = 10, File = "output/xstarovo.txt", ACCESS = "SEQUENTIAL")
+        Open(Unit = 10, File = "output/xstar_measles.txt", ACCESS = "SEQUENTIAL")
 
         write(10,*) xsol(1)
         write(10,*) xsol(2)
         write(10,*) xsol(3)
-        write(10,*) xsol(4)
 
         close(10)
 
@@ -314,31 +216,40 @@ Program ex_original
     !==============================================================================
     ! QUADRATIC ERROR OF EACH SCENARIO
     !==============================================================================
-    function fi(x,i,n) result (res)
+    subroutine fi(x,i,n,res)
         implicit none
 
         integer,        intent(in) :: n,i
         real(kind=8),   intent(in) :: x(n-1)
-        real(kind=8) :: res
+        real(kind=8),   intent(out) :: res
         
-        res = model(x,i,n) - y(i)
+        call model(x,i,n,res)
+        res = res - y(i)
         res = 0.5d0 * (res**2)
 
-    end function fi
+    end subroutine fi
 
     !==============================================================================
     ! MODEL TO BE FITTED TO THE DATA
     !==============================================================================
-    function model(x,i,n) result (res)
+    subroutine model(x,i,n,res)
         implicit none 
 
         integer,        intent(in) :: n,i
         real(kind=8),   intent(in) :: x(n-1)
-        real(kind=8) :: res      
+        real(kind=8),   intent(out) :: res
+        real(kind=8) :: a,b,c,ti,ebt
 
-        res = x(1) + x(2) * t(i) + x(3) * (t(i)**2) + x(4) * (t(i)**3)
+        a = x(1)
+        b = x(2)
+        c = x(3)
+        ti = t(i)
+        ebt = exp(-1.0d0 * b * ti)
 
-    end function model
+        res = (a / b) * ti * ebt + (1.0d0 / b) * ((a / b) - c) * (ebt - 1.0d0) - c * ti
+        res = 1.0d0 - exp(res)
+
+    end subroutine model
 
     !==============================================================================
     ! SUBROUTINES FOR ALGENCAN

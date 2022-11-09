@@ -1,5 +1,7 @@
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 def l(t,a,b,c):
     aux = a * t - c
@@ -27,19 +29,29 @@ for i in range(17,36,2):
 
 age[j:] = [40,45,55,65]
 
-y = np.array([
+seropositive = np.array([
     0.207,0.301,0.409,0.589,0.757,0.669,0.797,0.818,0.866,0.859,0.908,0.923,0.889,0.936,0.889,\
     0.898,0.959,0.957,0.937,0.918,0.939,0.967,0.973,0.943,0.967,0.946,0.961,0.968,0.968
 ])
 
-sol = np.array([0.197,0.287,0.021])
-
+solution = np.array([0.197,0.287,0.021])
 t = np.linspace(0,70,1000)
 
-plt.plot(age,y,"o")
-plt.plot(t,F(t,*sol))
-plt.show()
-plt.close()
+# sns.boxplot(x=seropositive)
+# plt.show()
 
-plt.plot(t,l(t,*sol))
-plt.show()
+age = np.insert(age,15,16)
+seropositive = np.insert(seropositive,15,0.6)
+
+age = np.insert(age,26,36)
+seropositive = np.insert(seropositive,26,0.7)
+
+age = np.insert(age,-1,60)
+seropositive = np.insert(seropositive,-1,0.7)
+
+samples = len(age)
+
+with open("output/measles.txt","w") as f:
+    f.write("%i\n" % samples)
+    for i in range(samples):
+        f.write("%i %f\n" % (age[i],seropositive[i]))
