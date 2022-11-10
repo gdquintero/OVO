@@ -27,7 +27,7 @@ Program ex_original
     read(100,*) samples
     n = 4
     alpha = 0.5d0
-    epsilon = 1.0d-6
+    epsilon = 1.0d-4
     size_delta_grid = 5
     size_sigmin_grid = 5
 
@@ -47,7 +47,6 @@ Program ex_original
     close(100)
 
     ! Coded subroutines
-
     coded(1:6)  = .true.  ! evalf, evalg, evalh, evalc, evaljac, evalhc
     coded(7:11) = .false. ! evalfc,evalgjac,evalgjacp,evalhl,evalhlp
 
@@ -127,7 +126,7 @@ Program ex_original
     ! call export(xstar)
 
     q = samples - 3
-    delta = 1.0d-2
+    delta = 1.0d-3
     sigmin = 1.0d0
 
     call ovo_algorithm(q,delta,sigmin,fobj,norm_grad)
@@ -223,6 +222,8 @@ Program ex_original
                     hnnzmax,epsfeas,epsopt,efstain,eostain,efacc,eoacc,outputfnm,   &
                     specfnm,nvparam,vparam,n,x,l,u,m,lambda,equatn,linear,coded,    &
                     checkder,f,cnorm,snorm,nlpsupn,inform)
+
+                print*, x
     
                 xtrial(1:n-1) = x(1:n-1)
     
@@ -262,15 +263,15 @@ Program ex_original
                 end if
             end do
     
-            do i = 1, m
-                opt_cond(:) = opt_cond(:) + lambda(i) * grad(i,:)
-            enddo
+            ! do i = 1, m
+            !     opt_cond(:) = opt_cond(:) + lambda(i) * grad(i,:)
+            ! enddo
     
-            opt_cond(:) = opt_cond(:) + nu_u(:) - nu_l(:)
+            ! opt_cond(:) = opt_cond(:) + nu_u(:) - nu_l(:)
     
-            print*, iter, iter_sub, fxtrial, norm2(opt_cond)
+            ! print*, iter, iter_sub, fxtrial, norm2(xk-xtrial)
     
-            if (norm2(opt_cond) .le. epsilon) exit
+            if (norm2(xk-xtrial) .le. epsilon) exit
             if (iter .ge. max_iter) exit
     
             deallocate(lambda,equatn,linear,grad)
@@ -357,7 +358,7 @@ Program ex_original
         b = x(2)
         c = x(3)
         ti = t(i)
-        ebt = exp(-1.0d0 * b * ti)
+        ebt = exp(-b * ti)
 
         res = (a / b) * ti * ebt + (1.0d0 / b) * ((a / b) - c) * (ebt - 1.0d0) - c * ti
         res = 1.0d0 - exp(res)

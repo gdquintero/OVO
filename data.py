@@ -55,3 +55,8 @@ with open("output/measles.txt","w") as f:
     f.write("%i\n" % samples)
     for i in range(samples):
         f.write("%i %f\n" % (age[i],seropositive[i]))
+
+plt.plot(age,seropositive,"o")
+plt.plot(t,F(t,*solution))
+plt.plot(t,l(t,*solution))
+plt.show()
