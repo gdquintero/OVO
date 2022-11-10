@@ -27,7 +27,7 @@ Program ex_original
     read(100,*) samples
     n = 4
     alpha = 0.5d0
-    epsilon = 1.0d-3
+    epsilon = 1.0d-6
     size_delta_grid = 5
     size_sigmin_grid = 5
 
@@ -126,25 +126,30 @@ Program ex_original
 
     ! call export(xstar)
 
-    call ovo_algorithm(0.1d0,1.d0,fobj,norm_grad)
+    q = samples - 3
+    delta = 1.0d-2
+    sigmin = 1.0d0
+
+    call ovo_algorithm(q,delta,sigmin,fobj,norm_grad)
 
     CONTAINS
 
     !==============================================================================
     ! MAIN ALGORITHM
     !==============================================================================
-    subroutine ovo_algorithm(delta,sigmin,fobj,norm_grad)
+    subroutine ovo_algorithm(q,delta,sigmin,fobj,norm_grad)
         implicit none
 
+        integer,        intent(in) :: q
         real(kind=8),   intent(in) :: delta, sigmin
         real(kind=8),   intent(out) :: fobj,norm_grad
 
         logical,        pointer :: equatn(:),linear(:)
         real(kind=8),   pointer :: lambda(:)
 
-        integer, parameter  :: max_iter = 10000, max_iter_sub = 1000, kflag = 2
+        integer, parameter  :: max_iter = 1000, max_iter_sub = 1000, kflag = 2
         integer             :: iter,iter_sub,i,j
-
+        real(kind=8)        :: gaux1,gaux2,a,b,c,ebt
 
         ! Initial solution
         xk(:) = 1.d0
@@ -162,12 +167,120 @@ Program ex_original
         call DSORT(faux,indices,samples,kflag)
     
         ! ! q-Order-Value function 
-        ! fxk = faux(q)
+        fxk = faux(q)
     
-        ! call mount_Idelta(faux,indices,delta,Idelta,m)
+        call mount_Idelta(faux,indices,delta,Idelta,m)
 
-        n_iter = 0
+        do
+            iter = iter + 1
+    
+            allocate(equatn(m),linear(m),lambda(m),grad(m,n-1),stat=allocerr)
+    
+            if ( allocerr .ne. 0 ) then
+                write(*,*) 'Allocation error in main program'
+                stop
+            end if
+    
+            equatn(:) = .false.
+            linear(:) = .false.
+            lambda(:) = 0.0d0
+    
+            a = xk(1)
+            b = xk(2)
+            c = xk(3)
+    
+            do i = 1, m
+                ti = t(Idelta(i))
 
+                ebt = exp(-1.0d0 * b * ti)
+
+                call model(xk,Idelta(i),n,gaux1)
+
+                gaux1 = gaux1 - y(Idelta(i))
+
+                gaux2 = exp((a / b) * ti * ebt + (1.0d0 / b) * ((a / b) - c) * (ebt - 1.0d0) - c * ti)
+    
+                grad(i,1) = (-1.0d0 / b) * (ebt * (ti - (1.0d0 / b)) - (1.0d0 / b))
+    
+                grad(i,2) = (a / b) * (ti**2) * ebt + (a / b**2) * ti * ebt + (a / b**3) * (ebt - 1.0d0) + &
+                            (ti / b) * ((a / b) - c) * ebt + (1.0d0 / b**2) * ((a / b) - c) * (ebt - 1.0d0)
+    
+                grad(i,3) = ti + (1.0d0 / b) * (ebt - 1.0d0)
+    
+                grad(i,:) = gaux1 * gaux2 * grad(i,:)
+            end do
+    
+            sigma = sigmin
+    
+            iter_sub = 1
+            x(:) = (/xk(:),0.0d0/)
+            ! x = 0.0d0
+    
+            ! Minimizing using ALGENCAN
+            do 
+                call algencan(myevalf,myevalg,myevalh,myevalc,myevaljac,myevalhc,   &
+                    myevalfc,myevalgjac,myevalgjacp,myevalhl,myevalhlp,jcnnzmax,    &
+                    hnnzmax,epsfeas,epsopt,efstain,eostain,efacc,eoacc,outputfnm,   &
+                    specfnm,nvparam,vparam,n,x,l,u,m,lambda,equatn,linear,coded,    &
+                    checkder,f,cnorm,snorm,nlpsupn,inform)
+    
+                xtrial(1:n-1) = x(1:n-1)
+    
+                indices(:) = (/(i, i = 1, samples)/)
+    
+                ! Scenarios
+                do i = 1, samples
+                    call fi(xtrial,i,n,faux(i))
+                end do
+    
+                ! Sorting
+                call DSORT(faux,indices,samples,kflag)
+        
+                fxtrial = faux(q)
+        
+                ! Test the sufficient descent condition
+                if (fxtrial .le. (fxk - alpha * norm2(xtrial(1:n-1) - xk(1:n-1))**2)) exit
+                if (iter_sub .ge. max_iter_sub) exit
+    
+                sigma = 2.0d0 * sigma
+                iter_sub = iter_sub + 1
+            end do ! End of internal iterations
+    
+            opt_cond(:) = 0.0d0
+            nu_l(:) = 0.0d0
+            nu_u(:) = 0.0d0
+    
+            do j = 1, n-1
+                if (xtrial(j) .le. l(j)) then 
+                    do i = 1, m
+                        nu_l(j) = nu_l(j) + lambda(i) * grad(i,j)
+                    end do
+                else if (xtrial(j) .ge. u(j)) then
+                    do i = 1, m
+                        nu_u(j) = nu_u(j) - lambda(i) * grad(i,j)
+                    end do
+                end if
+            end do
+    
+            do i = 1, m
+                opt_cond(:) = opt_cond(:) + lambda(i) * grad(i,:)
+            enddo
+    
+            opt_cond(:) = opt_cond(:) + nu_u(:) - nu_l(:)
+    
+            print*, iter, iter_sub, fxtrial, norm2(opt_cond)
+    
+            if (norm2(opt_cond) .le. epsilon) exit
+            if (iter .ge. max_iter) exit
+    
+            deallocate(lambda,equatn,linear,grad)
+            
+            xk(1:n-1) = xtrial(1:n-1)
+            fxk = fxtrial
+    
+            call mount_Idelta(faux,indices,delta,Idelta,m)
+    
+        end do ! End of Main Algorithm
         
     end subroutine
 
