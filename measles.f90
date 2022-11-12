@@ -102,6 +102,7 @@ Program ex_original
                     optind_delta = i
                     optind_sigmin = j
                     xstar(:) = xk(:)
+                    print*, xstar
                 end if
             end if
         end do
