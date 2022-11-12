@@ -78,37 +78,37 @@ Program ex_original
     u(1:n) = 1.0d+20
 
     ! ! Discretization of delta and sigmin
-    ! do i = 1, size_delta_grid
-    !     delta_grid(i) = 10.d0**(-i+1)
-    ! end do
+    do i = 1, size_delta_grid
+        delta_grid(i) = 10.d0**(-i+1)
+    end do
 
-    ! do i = 1, size_sigmin_grid
-    !     sigmin_grid(i) = 10.d0**(-i+3)
-    ! end do
+    do i = 1, size_sigmin_grid
+        sigmin_grid(i) = 10.d0**(-i+3)
+    end do
 
     ! ! "Heuristics"
-    ! q = samples - 10
+    q = samples - 3
 
-    ! do i = 1, size_delta_grid
-    !     do j = 1, size_sigmin_grid
-    !         if (i + j .eq. 2) then
-    !             call ovo_algorithm(delta_grid(1),sigmin_grid(1),fobj,norm_grad)
-    !             optind_delta = i
-    !             optind_sigmin = j
-    !         else 
-    !             call ovo_algorithm(delta_grid(i),sigmin_grid(j),aux,norm_grad)
-    !             if (aux .lt. fobj) then
-    !                 fobj = aux
-    !                 optind_delta = i
-    !                 optind_sigmin = j
-    !                 xstar(:) = xk(:)
-    !             end if
-    !         end if
-    !     end do
-    ! end do
+    do i = 1, size_delta_grid
+        do j = 1, size_sigmin_grid
+            if (i + j .eq. 2) then
+                call ovo_algorithm(q,delta_grid(1),sigmin_grid(1),fobj,norm_grad)
+                optind_delta = i
+                optind_sigmin = j
+            else 
+                call ovo_algorithm(q,delta_grid(i),sigmin_grid(j),aux,norm_grad)
+                if (aux .lt. fobj) then
+                    fobj = aux
+                    optind_delta = i
+                    optind_sigmin = j
+                    xstar(:) = xk(:)
+                end if
+            end if
+        end do
+    end do
 
-    ! delta = delta_grid(optind_delta)
-    ! sigmin = sigmin_grid(optind_sigmin)
+    delta = delta_grid(optind_delta)
+    sigmin = sigmin_grid(optind_sigmin)
 
     ! Open(Unit = 100, File = "output/table_severalq.txt", ACCESS = "SEQUENTIAL")
 
@@ -123,13 +123,13 @@ Program ex_original
 
     ! print*,xstar
 
-    ! call export(xstar)
+    call export(xstar)
 
     q = samples - 3
     delta = 1.0d-3
     sigmin = 1.0d0
 
-    call ovo_algorithm(q,delta,sigmin,fobj,norm_grad)
+    ! call ovo_algorithm(q,delta_grid(1),sigmin_grid(1),fobj,norm_grad)
 
     CONTAINS
 
@@ -222,8 +222,6 @@ Program ex_original
                     hnnzmax,epsfeas,epsopt,efstain,eostain,efacc,eoacc,outputfnm,   &
                     specfnm,nvparam,vparam,n,x,l,u,m,lambda,equatn,linear,coded,    &
                     checkder,f,cnorm,snorm,nlpsupn,inform)
-
-                print*, x
     
                 xtrial(1:n-1) = x(1:n-1)
     
@@ -270,11 +268,11 @@ Program ex_original
             ! opt_cond(:) = opt_cond(:) + nu_u(:) - nu_l(:)
     
             ! print*, iter, iter_sub, fxtrial, norm2(xk-xtrial)
+
+            deallocate(lambda,equatn,linear,grad)
     
             if (norm2(xk-xtrial) .le. epsilon) exit
             if (iter .ge. max_iter) exit
-    
-            deallocate(lambda,equatn,linear,grad)
             
             xk(1:n-1) = xtrial(1:n-1)
             fxk = fxtrial
