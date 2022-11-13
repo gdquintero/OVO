@@ -41,13 +41,14 @@ t = np.linspace(0,70,1000)
 # plt.show()
 
 free_pos = np.empty(age[-1]-29,dtype=int)
-
 j = 0
 
 for i in range(1,int(age[-1])+1):
     if i not in age:
         free_pos[j] = i
         j += 1
+
+print(free_pos)
 
 outlier1 = 0.2
 outlier2 = 0.2
