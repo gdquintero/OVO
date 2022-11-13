@@ -5,7 +5,7 @@ Program ex_original
     
     integer :: allocerr,i,j,k,size_delta_grid,size_sigmin_grid,optind_delta,optind_sigmin,&
                n_iter,n_int_iter,samples,q 
-    real(kind=8) :: alpha,epsilon,delta,sigmin,fobj,aux,fxk,fxtrial,gaux,ti,norm_grad,sigma
+    real(kind=8) :: alpha,epsilon,delta,sigmin,fobj,fxk,fxtrial,ti,norm_grad,sigma
     real(kind=8), allocatable :: xtrial(:),faux(:),indices(:),nu_l(:),nu_u(:),opt_cond(:),&
                                  delta_grid(:),sigmin_grid(:),xstar(:),xk(:),grad(:,:),y(:)
     integer, allocatable :: Idelta(:),t(:)
@@ -27,7 +27,7 @@ Program ex_original
     read(100,*) samples
     n = 4
     alpha = 0.5d0
-    epsilon = 1.0d-4
+    epsilon = 1.0d-7
     size_delta_grid = 5
     size_sigmin_grid = 5
 
@@ -74,8 +74,11 @@ Program ex_original
     nvparam   = 1
     vparam(1) = 'ITERATIONS-OUTPUT-DETAIL 0' 
 
-    l(1:n) = -1.0d+20
-    u(1:n) = 1.0d+20
+    ! l(1:n) = -1.0d+20
+    ! u(1:n) = 1.0d+20
+
+    l(1:n-1) = 0.0d0; l(n) = -1.0d+20
+    u(1:n-1) = 1.0d+20; u(n) = 0.0d0
 
     ! ! Discretization of delta and sigmin
     do i = 1, size_delta_grid
@@ -131,6 +134,8 @@ Program ex_original
 
     call ovo_algorithm(q,delta,sigmin,fobj,norm_grad)
 
+    ! print*, xk
+
     call export(xk)
 
     CONTAINS
@@ -153,7 +158,7 @@ Program ex_original
         real(kind=8)        :: gaux1,gaux2,a,b,c,ebt
 
         ! Initial solution
-        xk(:) = 1.d0
+        xk(:) = 1.d-1
 
         iter = 0
     
@@ -167,7 +172,7 @@ Program ex_original
         ! Sorting
         call DSORT(faux,indices,samples,kflag)
     
-        ! ! q-Order-Value function 
+        ! q-Order-Value function 
         fxk = faux(q)
     
         call mount_Idelta(faux,indices,delta,Idelta,m)
@@ -197,16 +202,16 @@ Program ex_original
 
                 call model(xk,Idelta(i),n,gaux1)
 
-                gaux1 = gaux1 - y(Idelta(i))
+                gaux1 = y(Idelta(i)) - gaux1
 
                 gaux2 = exp((a / b) * ti * ebt + (1.0d0 / b) * ((a / b) - c) * (ebt - 1.0d0) - c * ti)
     
-                grad(i,1) = (-1.0d0 / b) * (ebt * (ti - (1.0d0 / b)) - (1.0d0 / b))
+                grad(i,1) = (1.0d0 / b) * (ebt * (ti + (1.0d0 / b)) - (1.0d0 / b))
     
-                grad(i,2) = (a / b) * (ti**2) * ebt + (a / b**2) * ti * ebt + (a / b**3) * (ebt - 1.0d0) + &
-                            (ti / b) * ((a / b) - c) * ebt + (1.0d0 / b**2) * ((a / b) - c) * (ebt - 1.0d0)
+                grad(i,2) = (-a / b) * (ti**2) * ebt - (a / b**2) * ti * ebt - (a / b**3) * (ebt - 1.0d0) + &
+                            (ti / b) * (c - (a / b)) * ebt + (1.0d0 / b**2) * (c - (a / b)) * (ebt - 1.0d0)
     
-                grad(i,3) = ti + (1.0d0 / b) * (ebt - 1.0d0)
+                grad(i,3) = -ti - (1.0d0/b) * (ebt - 1.0d0)
     
                 grad(i,:) = gaux1 * gaux2 * grad(i,:)
             end do
@@ -263,17 +268,17 @@ Program ex_original
                 end if
             end do
     
-            ! do i = 1, m
-            !     opt_cond(:) = opt_cond(:) + lambda(i) * grad(i,:)
-            ! enddo
+            do i = 1, m
+                opt_cond(:) = opt_cond(:) + lambda(i) * grad(i,:)
+            enddo
     
-            ! opt_cond(:) = opt_cond(:) + nu_u(:) - nu_l(:)
+            opt_cond(:) = opt_cond(:) + nu_u(:) - nu_l(:)
     
-            ! print*, iter, iter_sub, fxtrial, norm2(xk-xtrial)
+            print*, iter, iter_sub, fxtrial, norm2(opt_cond)
 
             deallocate(lambda,equatn,linear,grad)
     
-            if (norm2(xk-xtrial) .le. epsilon) exit
+            if (norm2(opt_cond) .le. epsilon) exit
             if (iter .ge. max_iter) exit
             
             xk(1:n-1) = xtrial(1:n-1)
@@ -360,8 +365,9 @@ Program ex_original
         ti = t(i)
         ebt = exp(-b * ti)
 
-        res = (a / b) * ti * ebt + (1.0d0 / b) * ((a / b) - c) * (ebt - 1.0d0) - c * ti
-        res = 1.0d0 - exp(res)
+        res = (a / b) * ti * ebt
+        res = res + (1.0d0 / b) * ((a / b) - c) * (ebt - 1.0d0) 
+        res = 1.0d0 - exp(res - c * ti)
 
     end subroutine model
 
