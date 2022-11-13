@@ -87,29 +87,28 @@ Program ex_original
     end do
 
     ! ! "Heuristics"
-    q = samples - 3
+    ! q = samples - 3
 
-    do i = 1, size_delta_grid
-        do j = 1, size_sigmin_grid
-            if (i + j .eq. 2) then
-                call ovo_algorithm(q,delta_grid(1),sigmin_grid(1),fobj,norm_grad)
-                optind_delta = i
-                optind_sigmin = j
-            else 
-                call ovo_algorithm(q,delta_grid(i),sigmin_grid(j),aux,norm_grad)
-                if (aux .lt. fobj) then
-                    fobj = aux
-                    optind_delta = i
-                    optind_sigmin = j
-                    xstar(:) = xk(:)
-                    print*, xstar
-                end if
-            end if
-        end do
-    end do
+    ! do i = 1, size_delta_grid
+    !     do j = 1, size_sigmin_grid
+    !         if (i + j .eq. 2) then
+    !             call ovo_algorithm(q,delta_grid(1),sigmin_grid(1),fobj,norm_grad)
+    !             optind_delta = i
+    !             optind_sigmin = j
+    !         else 
+    !             call ovo_algorithm(q,delta_grid(i),sigmin_grid(j),aux,norm_grad)
+    !             if (aux .lt. fobj) then
+    !                 fobj = aux
+    !                 optind_delta = i
+    !                 optind_sigmin = j
+    !                 xstar(:) = xk(:)
+    !             end if
+    !         end if
+    !     end do
+    ! end do
 
-    delta = delta_grid(optind_delta)
-    sigmin = sigmin_grid(optind_sigmin)
+    ! delta = delta_grid(optind_delta)
+    ! sigmin = sigmin_grid(optind_sigmin)
 
     ! Open(Unit = 100, File = "output/table_severalq.txt", ACCESS = "SEQUENTIAL")
 
@@ -124,13 +123,15 @@ Program ex_original
 
     ! print*,xstar
 
-    call export(xstar)
+    ! call export(xstar)
 
     q = samples - 3
     delta = 1.0d-3
     sigmin = 1.0d0
 
-    ! call ovo_algorithm(q,delta_grid(1),sigmin_grid(1),fobj,norm_grad)
+    call ovo_algorithm(q,delta,sigmin,fobj,norm_grad)
+
+    call export(xk)
 
     CONTAINS
 
@@ -292,13 +293,13 @@ Program ex_original
 
         real(kind=8),   intent(in) :: xsol(n-1)
 
-        Open(Unit = 10, File = "output/xstar_measles.txt", ACCESS = "SEQUENTIAL")
+        Open(Unit = 100, File = "output/xstar_measles.txt", ACCESS = "SEQUENTIAL")
 
-        write(10,*) xsol(1)
-        write(10,*) xsol(2)
-        write(10,*) xsol(3)
-
-        close(10)
+        write(100,*) xsol(1)
+        write(100,*) xsol(2)
+        write(100,*) xsol(3)
+    
+        close(100)
 
     end subroutine export
 
