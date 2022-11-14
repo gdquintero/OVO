@@ -5,7 +5,7 @@ Program Measles
     
     integer :: allocerr,i,j,k,size_delta_grid,size_sigmin_grid,optind_delta,optind_sigmin,&
                n_iter,n_int_iter,samples,q 
-    real(kind=8) :: alpha,epsilon,delta,sigmin,fobj,fxk,fxtrial,ti,norm_grad,sigma
+    real(kind=8) :: alpha,epsilon,delta,sigmin,fobj,fxk,fxtrial,ti,norm_grad,sigma,aux
     real(kind=8), allocatable :: xtrial(:),faux(:),indices(:),nu_l(:),nu_u(:),opt_cond(:),&
                                  delta_grid(:),sigmin_grid(:),xstar(:),xk(:),grad(:,:),y(:)
     integer, allocatable :: Idelta(:),t(:)
@@ -89,8 +89,10 @@ Program Measles
         sigmin_grid(i) = 10.d0**(-i+3)
     end do
 
-    ! ! "Heuristics"
-    ! q = samples - 3
+    print*, delta_grid
+
+    ! "Heuristics"
+    ! q = samples - 5
 
     ! do i = 1, size_delta_grid
     !     do j = 1, size_sigmin_grid
@@ -116,7 +118,7 @@ Program Measles
     ! Open(Unit = 100, File = "output/table_severalq.txt", ACCESS = "SEQUENTIAL")
 
     ! do q = 30, 40
-    !     call ovo_algorithm(delta_grid(optind_delta),sigmin_grid(optind_sigmin),fobj,norm_grad)
+    !     call ovo_algorithm(q,delta_grid(optind_delta),sigmin_grid(optind_sigmin),fobj,norm_grad)
     !     print*, q, xk, fobj, norm_grad
     !     write(100,10) q,'&',xk(1),'&',xk(2),'&',xk(3),'&',xk(4),'&',fobj,'&',n_iter,'\\'
     !     10 format (I2,1X,A1,1X,F10.6,1X,A1,1X,F10.6,1X,A1,1X,F10.6,1X,A1,1X,F10.6,1X,A1,1X,F10.6,1X,A1,1X,I3,1X,A2)
@@ -124,15 +126,14 @@ Program Measles
 
     ! close(100)
 
-    ! print*,xstar
+    print*,xstar
 
     ! call export(xstar)
 
-    q = samples - 5
-    delta = 1.0d-2
-    sigmin = 1.0d+1
+    ! delta = 1.0d-2
+    ! sigmin = 1.0d+1
 
-    call ovo_algorithm(q,delta,sigmin,fobj,norm_grad)
+    ! call ovo_algorithm(q,delta,sigmin,fobj,norm_grad)
 
     ! print*, xk
 
