@@ -128,9 +128,9 @@ Program ex_original
 
     ! call export(xstar)
 
-    q = samples - 3
-    delta = 1.0d-3
-    sigmin = 1.0d0
+    q = samples - 5
+    delta = 1.0d-2
+    sigmin = 1.0d+1
 
     call ovo_algorithm(q,delta,sigmin,fobj,norm_grad)
 
@@ -153,7 +153,7 @@ Program ex_original
         logical,        pointer :: equatn(:),linear(:)
         real(kind=8),   pointer :: lambda(:)
 
-        integer, parameter  :: max_iter = 1000, max_iter_sub = 1000, kflag = 2
+        integer, parameter  :: max_iter = 100000, max_iter_sub = 1000, kflag = 2
         integer             :: iter,iter_sub,i,j
         real(kind=8)        :: gaux1,gaux2,a,b,c,ebt
 
