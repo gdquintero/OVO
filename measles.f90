@@ -127,12 +127,13 @@ Program Measles
 
     ! call export(xstar)
 
-    ! delta = 1.0d-2
+    ! delta = 1.0d0
     ! sigmin = 1.0d+1
 
     ! call ovo_algorithm(q,delta,sigmin,fobj,norm_grad)
 
-    ! print*, xk
+    ! ! print*, xk
+    ! print*, fobj
 
     call export(xk)
 
@@ -227,7 +228,7 @@ Program Measles
                     hnnzmax,epsfeas,epsopt,efstain,eostain,efacc,eoacc,outputfnm,   &
                     specfnm,nvparam,vparam,n,x,l,u,m,lambda,equatn,linear,coded,    &
                     checkder,f,cnorm,snorm,nlpsupn,inform)
-    
+
                 xtrial(1:n-1) = x(1:n-1)
     
                 indices(:) = (/(i, i = 1, samples)/)
@@ -275,6 +276,8 @@ Program Measles
             ! print*, iter, iter_sub, fxtrial, norm2(opt_cond)
 
             deallocate(lambda,equatn,linear,grad)
+
+            fobj = fxtrial
     
             if (norm2(opt_cond) .le. epsilon) exit
             if (iter .ge. max_iter) exit
@@ -283,6 +286,7 @@ Program Measles
             fxk = fxtrial
     
             call mount_Idelta(faux,indices,delta,Idelta,m)
+
     
         end do ! End of Main Algorithm
         
