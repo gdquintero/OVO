@@ -27,7 +27,7 @@ Program Measles
     read(100,*) samples
     n = 4
     alpha = 0.5d0
-    epsilon = 1.0d-7
+    epsilon = 1.0d-4
     size_delta_grid = 5
     size_sigmin_grid = 5
 
@@ -74,9 +74,6 @@ Program Measles
     nvparam   = 1
     vparam(1) = 'ITERATIONS-OUTPUT-DETAIL 0' 
 
-    ! l(1:n) = -1.0d+20
-    ! u(1:n) = 1.0d+20
-
     l(1:n-1) = 0.0d0; l(n) = -1.0d+20
     u(1:n-1) = 1.0d+20; u(n) = 0.0d0
 
@@ -89,31 +86,31 @@ Program Measles
         sigmin_grid(i) = 10.d0**(-i+3)
     end do
 
-    print*, delta_grid
-
     ! "Heuristics"
-    ! q = samples - 5
+    q = samples - 5
 
-    ! do i = 1, size_delta_grid
-    !     do j = 1, size_sigmin_grid
-    !         if (i + j .eq. 2) then
-    !             call ovo_algorithm(q,delta_grid(1),sigmin_grid(1),fobj,norm_grad)
-    !             optind_delta = i
-    !             optind_sigmin = j
-    !         else 
-    !             call ovo_algorithm(q,delta_grid(i),sigmin_grid(j),aux,norm_grad)
-    !             if (aux .lt. fobj) then
-    !                 fobj = aux
-    !                 optind_delta = i
-    !                 optind_sigmin = j
-    !                 xstar(:) = xk(:)
-    !             end if
-    !         end if
-    !     end do
-    ! end do
+    do i = 1, size_delta_grid
+        do j = 1, size_sigmin_grid
+            if (i + j .eq. 2) then
+                call ovo_algorithm(q,delta_grid(1),sigmin_grid(1),fobj,norm_grad)
+                optind_delta = i
+                optind_sigmin = j
+            else 
+                call ovo_algorithm(q,delta_grid(i),sigmin_grid(j),aux,norm_grad)
+                if (aux .lt. fobj) then
+                    fobj = aux
+                    optind_delta = i
+                    optind_sigmin = j
+                    xstar(:) = xk(:)
+                end if
+            end if
+        end do
+    end do
 
-    ! delta = delta_grid(optind_delta)
-    ! sigmin = sigmin_grid(optind_sigmin)
+    delta = delta_grid(optind_delta)
+    sigmin = sigmin_grid(optind_sigmin)
+
+    print*, delta, sigmin
 
     ! Open(Unit = 100, File = "output/table_severalq.txt", ACCESS = "SEQUENTIAL")
 
@@ -275,7 +272,7 @@ Program Measles
     
             opt_cond(:) = opt_cond(:) + nu_u(:) - nu_l(:)
     
-            print*, iter, iter_sub, fxtrial, norm2(opt_cond)
+            ! print*, iter, iter_sub, fxtrial, norm2(opt_cond)
 
             deallocate(lambda,equatn,linear,grad)
     
