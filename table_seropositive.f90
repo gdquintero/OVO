@@ -33,11 +33,14 @@ program table
                         '$[',age(i+15),',',age(i+16),')$','&',measles(i+15),'&',mumps(i+15),'&',rubella(i+15),'\\'
             110 format (A2,I2,A1,I2,A2,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,&
                         A2,I2,A1,I2,A2,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A2)
+        else
+            write(100,120) '$[',age(i),',',age(i+1),')$','&',measles(i),'&',mumps(i),'&',rubella(i),'&','&','&','\\'
+            120 format (A2,I2,A1,I2,A2,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,A1,1X,A1,1X,A2)
         end if
     end do
 
-    write(100,120) '$[',age(i),',',age(i+1),')$','&',measles(i),'&',mumps(i),'&',rubella(i),&
-                    '$[',age(i+15),',',age(i+16),')$','&',measles(i+15),'&',mumps(i+15),'&',rubella(i+15),'\\'
-    120 format (A2,I2,A1,A7,A2,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A2)
+    ! write(100,120) '$[',age(i),',',age(i+1),')$','&',measles(i),'&',mumps(i),'&',rubella(i),&
+    !                 '$[',age(i+15),',',age(i+16),')$','&',measles(i+15),'&',mumps(i+15),'&',rubella(i+15),'\\'
+    ! 120 format (A2,I2,A1,A7,A2,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A2)
 
 end program
