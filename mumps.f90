@@ -1,4 +1,4 @@
-Program Measles
+Program Mumps
     use sort
 
     implicit none 
@@ -21,7 +21,7 @@ Program Measles
     real(kind=8),   pointer :: l(:),u(:),x(:)
 
     ! Reading data and storing it in the variables t and y
-    Open(Unit = 100, File = "output/measles.txt", ACCESS = "SEQUENTIAL")
+    Open(Unit = 100, File = "output/mumps.txt", ACCESS = "SEQUENTIAL")
 
     ! Set parameters
     read(100,*) samples
@@ -110,7 +110,7 @@ Program Measles
     delta = delta_grid(optind_delta)
     sigmin = sigmin_grid(optind_sigmin)
 
-    print*, "Measles: ", delta, sigmin
+    print*, "Mumps: ", delta, sigmin
 
     ! Open(Unit = 100, File = "output/table_severalq.txt", ACCESS = "SEQUENTIAL")
 
@@ -638,4 +638,4 @@ Program Measles
         flag = - 1
 
     end subroutine myevalhlp
-end Program Measles
+end Program mumps
