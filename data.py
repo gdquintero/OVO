@@ -20,7 +20,7 @@ def G(arr):
     return -1.0 * np.log(1.0 - arr)
 
 def L(F,dF,dt):
-    return dF / (dt * (1.0 - F[2:]))
+    return dF / (dt * (1.0 - F))
 
 def moving_average(arr,window):
     n = arr.shape[0] - window + 1
@@ -31,13 +31,10 @@ def moving_average(arr,window):
 
     return averages
 
-age = np.empty((29,2))
 
 age = np.array([
     1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,17,19,21,23,25,27,29,31,33,35,40,45,55,65
 ])
-
-delta_age = age[1:] - age[0:-1]
 
 sero_measles = np.array([
     0.207,0.301,0.409,0.589,0.757,0.669,0.797,0.818,0.866,0.859,0.908,0.923,0.889,0.936,0.889,\
@@ -58,12 +55,28 @@ sol_measles = np.array([0.197,0.287,0.021])
 sol_mumps = np.array([0.156,0.250,0.0])
 sol_rubella = np.array([0.0628,0.178,0.020])
 
-sero_measles_smoothed = moving_average(G(sero_measles),3)
+# Calculamos los incrementos de la variable temporal
+delta_age = age[1:] - age[:-1]
+
+# Suavizamos las proporciones de seropositivos usando media movil de 3 puntos
+sero_measles_smoothed = moving_average(sero_measles,3)
+sero_mumps_smoothed = moving_average(sero_mumps,3)
+sero_rubella_smoothed = moving_average(sero_rubella,3)
+
+# Calculamos los incrementos de las proporciones suavizadas
+delta_sero_measles = sero_measles_smoothed[1:] - sero_measles_smoothed[:-1]
+delta_sero_mumps = sero_mumps_smoothed[1:] - sero_mumps_smoothed[:-1]
+delta_sero_rubella = sero_rubella_smoothed[1:] - sero_rubella_smoothed[:-1]
+
+
+
+# print(sero_measles_smoothed.shape,delta_sero_measles.shape,delta_age.shape)
+
 # sero_mumps_smoothed = 
 # sero_rubella_smoothed = 
 
-# plt.plot(age_smoothed,L(sero_measles,sero_measles_smoothed,age_smoothed),"-")
-# plt.show()
+plt.plot(age[3:],L(sero_rubella_smoothed[1:],delta_sero_rubella,delta_age[2:]),"-")
+plt.show()
 
 t = np.linspace(0,70,1000)
 
