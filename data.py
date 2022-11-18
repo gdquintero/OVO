@@ -42,8 +42,23 @@ sol_rubella = np.array([0.0628,0.178,0.020])
 
 t = np.linspace(0,70,1000)
 
-# sns.boxplot(x=sero_measles)
+# plt.ylim([0,1.1])
+# plt.plot(age,sero_measles,"o",ls=":")
+# plt.savefig("sero_measles.pdf",bbox_inches = "tight") 
+# plt.close()
+
+# plt.ylim([0,1.1])
+# plt.plot(age,sero_mumps,"o",ls=":")
+# plt.savefig("sero_mumps.pdf",bbox_inches = "tight") 
+# plt.close()
+
+# plt.ylim([0,1.1])
+# plt.plot(age,sero_rubella,"o",ls=":") 
+# plt.savefig("sero_rubella.pdf",bbox_inches = "tight")  
 # plt.show()
+
+sns.boxplot(x=sero_measles)
+plt.show()
 
 outliers = np.empty((3,5))
 outliers[0,0] = F(16,*sol_measles) - random.uniform(0.2,0.3)
@@ -105,17 +120,17 @@ with open("output/rubella.txt","w") as f:
     for i in range(samples):
         f.write("%i %f\n" % (age[i],sero_rubella[i]))
 
-plt.plot(age,sero_measles,"o")
-plt.plot(t,F(t,*sol_measles))
-plt.show()
+# plt.plot(age,sero_measles,"o")
+# plt.plot(t,F(t,*sol_measles))
+# plt.show()
 
-plt.plot(age,sero_mumps,"o")
-plt.plot(t,F(t,*sol_mumps))
-plt.show()
+# plt.plot(age,sero_mumps,"o")
+# plt.plot(t,F(t,*sol_mumps))
+# plt.show()
 
-plt.plot(age,sero_rubella,"o")
-plt.plot(t,F(t,*sol_rubella))
-plt.show()
+# plt.plot(age,sero_rubella,"o")
+# plt.plot(t,F(t,*sol_rubella))
+# plt.show()
 
 # plt.plot(t,l(t,*sol_measles))
 # plt.show()
