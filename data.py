@@ -16,24 +16,6 @@ def F(t,a,b,c):
     aux = 1.0 - np.exp(aux)
     return aux
 
-def G(arr):
-    return -1.0 * np.log(1.0 - arr)
-
-def L(F,dF,dt):
-    return dF / (dt * (1.0 - F))
-
-def R(F,dF,t,dt):
-    return -1.0 * np.log(np.abs(L(F,dF,dt)) / t)
-
-def moving_average(arr,window):
-    n = arr.shape[0] - window + 1
-    averages = np.empty(n)
-
-    for i in range(n):
-        averages[i] = np.sum(arr[i:i+window]) / window
-
-    return averages
-
 
 age = np.array([
     1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,17,19,21,23,25,27,29,31,33,35,40,45,55,65
@@ -58,24 +40,6 @@ sol_measles = np.array([0.197,0.287,0.021])
 sol_mumps = np.array([0.156,0.250,0.0])
 sol_rubella = np.array([0.0628,0.178,0.020])
 
-# Calculamos los incrementos de la variable temporal
-delta_age = age[1:] - age[:-1]
-
-# Suavizamos las proporciones de seropositivos usando media movil de 3 puntos
-sero_measles_smoothed = moving_average(sero_measles,3)
-sero_mumps_smoothed = moving_average(sero_mumps,3)
-sero_rubella_smoothed = moving_average(sero_rubella,3)
-
-# Calculamos los incrementos de las proporciones suavizadas
-delta_sero_measles = sero_measles_smoothed[1:] - sero_measles_smoothed[:-1]
-delta_sero_mumps = sero_mumps_smoothed[1:] - sero_mumps_smoothed[:-1]
-delta_sero_rubella = sero_rubella_smoothed[1:] - sero_rubella_smoothed[:-1]
-
-# print(len(sero_measles_smoothed[1:]),len(delta_sero_measles),len(age[4:]))
-
-plt.plot(age[3:],R(sero_mumps_smoothed[1:],delta_sero_mumps,age[3:],delta_age[2:]),"o")
-plt.show()
-
 t = np.linspace(0,70,1000)
 
 
@@ -94,11 +58,6 @@ t = np.linspace(0,70,1000)
 # plt.plot(age,sero_rubella,"o",ls=":") 
 # plt.savefig("sero_rubella.pdf",bbox_inches = "tight")  
 # plt.show()
-
-
-
-
-
 
 # outliers = np.empty((3,5))
 # outliers[0,0] = F(16,*sol_measles) - random.uniform(0.2,0.3)
@@ -160,9 +119,9 @@ t = np.linspace(0,70,1000)
 #     for i in range(samples):
 #         f.write("%i %f\n" % (age[i],sero_rubella[i]))
 
-# plt.plot(age,sero_measles,"o",ls=":")
-# plt.plot(t,F(t,*sol_measles))
-# plt.show()
+plt.plot(age,sero_measles,"o")
+plt.plot(t,F(t,*sol_measles))
+plt.show()
 
 # plt.plot(age,sero_mumps,"o")
 # plt.plot(t,F(t,*sol_mumps))
