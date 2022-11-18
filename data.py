@@ -22,6 +22,9 @@ def G(arr):
 def L(F,dF,dt):
     return dF / (dt * (1.0 - F))
 
+def R(F,dF,t,dt):
+    return -1.0 * np.log(np.abs(L(F,dF,dt)) / t)
+
 def moving_average(arr,window):
     n = arr.shape[0] - window + 1
     averages = np.empty(n)
@@ -68,14 +71,9 @@ delta_sero_measles = sero_measles_smoothed[1:] - sero_measles_smoothed[:-1]
 delta_sero_mumps = sero_mumps_smoothed[1:] - sero_mumps_smoothed[:-1]
 delta_sero_rubella = sero_rubella_smoothed[1:] - sero_rubella_smoothed[:-1]
 
+# print(len(sero_measles_smoothed[1:]),len(delta_sero_measles),len(age[4:]))
 
-
-# print(sero_measles_smoothed.shape,delta_sero_measles.shape,delta_age.shape)
-
-# sero_mumps_smoothed = 
-# sero_rubella_smoothed = 
-
-plt.plot(age[3:],L(sero_rubella_smoothed[1:],delta_sero_rubella,delta_age[2:]),"-")
+plt.plot(age[3:],R(sero_mumps_smoothed[1:],delta_sero_mumps,age[3:],delta_age[2:]),"o")
 plt.show()
 
 t = np.linspace(0,70,1000)
