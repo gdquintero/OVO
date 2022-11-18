@@ -28,9 +28,9 @@ df = pd.read_table("output/measles.txt",delimiter=" ",header=None,skiprows=1)
 
 t = np.linspace(0,70,1000)
 
-plt.plot(df[0].values,df[1].values,"ko")
+plt.plot(df[0].values,df[1].values,"o")
 plt.plot(t,F(t,*x_measles))
 plt.show()
 
-plt.plot(t,l(t,*x_measles))
-plt.show()
+# plt.plot(t,l(t,*x_measles))
+# plt.show()
