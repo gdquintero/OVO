@@ -42,6 +42,7 @@ sol_rubella = np.array([0.0628,0.178,0.020])
 
 t = np.linspace(0,70,1000)
 
+print(random.sample(range(1, 65), 3))
 
 # Graficar cada una de las proporciones de seropositivos
 # plt.ylim([0,1.1])
@@ -119,9 +120,9 @@ t = np.linspace(0,70,1000)
 #     for i in range(samples):
 #         f.write("%i %f\n" % (age[i],sero_rubella[i]))
 
-plt.plot(age,sero_measles,"o")
-plt.plot(t,F(t,*sol_measles))
-plt.show()
+# plt.plot(age,sero_measles,"o")
+# plt.plot(t,F(t,*sol_measles))
+# plt.show()
 
 # plt.plot(age,sero_mumps,"o")
 # plt.plot(t,F(t,*sol_mumps))
