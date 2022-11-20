@@ -41,10 +41,11 @@ sol_rubella = np.array([0.0628,0.178,0.020])
 
 t = np.linspace(0,70,1000)
 
-n_outliers = 6
-inf = 0.2
-sup = 0.5
-even_odd = [1,2]
+n_outliers = 11
+inf = 0.1
+sup = 0.3
+
+outliers = np.empty((2,n_outliers))
 
 # Lista con posibles valores para las edades
 free_ages = []
@@ -62,21 +63,27 @@ for i in range(n_outliers):
 
     # Insertamos la nueva edad y su seropositivo correspondiente
     age = np.insert(age,ind+1,new_age)
-    outlier = F(age[ind],*sol_measles) + ((-1.) ** random.sample(even_odd,1)[0]) * random.uniform(inf,sup)
+    outlier = F(age[ind],*sol_measles) - random.uniform(inf,sup)
     sero_measles = np.insert(sero_measles,ind+1,outlier)
+
+    outliers[0,i] = new_age 
+    outliers[1,i] = outlier
 
     # Eliminamos la edad recien ingresada en age
     free_ages.remove(new_age)
 
-plt.plot(age,sero_measles,"o")
-plt.show()
+# plt.plot(age,sero_measles,"o")
+# plt.plot(outliers[0,:],outliers[1,:],'ro',mfc='none',ms=10)
+# plt.show()
 
 
 # Graficar cada una de las proporciones de seropositivos
-# plt.ylim([0,1.1])
-# plt.plot(age,sero_measles,"o",ls=":")
+plt.ylim([0,1.1])
+plt.plot(age,sero_measles,"o",ls=":")
+plt.plot(outliers[0,:],outliers[1,:],'ro',mfc='none',ms=10)
 # plt.savefig("sero_measles.pdf",bbox_inches = "tight") 
 # plt.close()
+plt.show()
 
 # plt.ylim([0,1.1])
 # plt.plot(age,sero_mumps,"o",ls=":")
@@ -87,49 +94,6 @@ plt.show()
 # plt.plot(age,sero_rubella,"o",ls=":") 
 # plt.savefig("sero_rubella.pdf",bbox_inches = "tight")  
 # plt.show()
-
-# outliers = np.empty((3,5))
-# outliers[0,0] = F(16,*sol_measles) - random.uniform(0.2,0.3)
-# outliers[0,1] = F(18,*sol_measles) - random.uniform(0.2,0.3)
-# outliers[0,2] = F(20,*sol_measles) - random.uniform(0.2,0.3)
-# outliers[0,3] = F(22,*sol_measles) - random.uniform(0.2,0.3)
-# outliers[0,4] = F(24,*sol_measles) - random.uniform(0.2,0.3)
-
-# outliers[1,0] = F(16,*sol_mumps) - random.uniform(0.2,0.3)
-# outliers[1,1] = F(18,*sol_mumps) - random.uniform(0.2,0.3)
-# outliers[1,2] = F(20,*sol_mumps) - random.uniform(0.2,0.3)
-# outliers[1,3] = F(22,*sol_mumps) - random.uniform(0.2,0.3)
-# outliers[1,4] = F(24,*sol_mumps) - random.uniform(0.2,0.3)
-
-# outliers[2,0] = F(16,*sol_rubella) - random.uniform(0.2,0.3)
-# outliers[2,1] = F(18,*sol_rubella) - random.uniform(0.2,0.3)
-# outliers[2,2] = F(20,*sol_rubella) - random.uniform(0.2,0.3)
-# outliers[2,3] = F(22,*sol_rubella) - random.uniform(0.2,0.3)
-# outliers[2,4] = F(24,*sol_rubella) - random.uniform(0.2,0.3)
-
-# age = np.insert(age,15,16)
-# age = np.insert(age,17,18)
-# age = np.insert(age,19,20)
-# age = np.insert(age,21,22)
-# age = np.insert(age,23,24)
-
-# sero_measles = np.insert(sero_measles,15,outliers[0,0])
-# sero_measles = np.insert(sero_measles,17,outliers[0,1])
-# sero_measles = np.insert(sero_measles,19,outliers[0,2])
-# sero_measles = np.insert(sero_measles,21,outliers[0,3])
-# sero_measles = np.insert(sero_measles,23,outliers[0,4])
-
-# sero_mumps = np.insert(sero_mumps,15,outliers[1,0])
-# sero_mumps = np.insert(sero_mumps,17,outliers[1,1])
-# sero_mumps = np.insert(sero_mumps,19,outliers[1,2])
-# sero_mumps = np.insert(sero_mumps,21,outliers[1,3])
-# sero_mumps = np.insert(sero_mumps,23,outliers[1,4])
-
-# sero_rubella = np.insert(sero_rubella,15,outliers[2,0])
-# sero_rubella = np.insert(sero_rubella,17,outliers[2,1])
-# sero_rubella = np.insert(sero_rubella,19,outliers[2,2])
-# sero_rubella = np.insert(sero_rubella,21,outliers[2,3])
-# sero_rubella = np.insert(sero_rubella,23,outliers[2,4])
 
 # samples = len(age)
 
