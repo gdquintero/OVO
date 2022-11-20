@@ -91,9 +91,10 @@ sol_mumps = np.array([0.156,0.250,0.0])
 sol_rubella = np.array([0.0628,0.178,0.020])
 
 # Contaminamos los datos con n_outliers valores atipicos
-pollute_age_measles,pollute_sero_measles,outliers_measles = pollute_data(age,sero_measles,11)
-pollute_age_mumps,pollute_sero_mumps,outliers_mumps = pollute_data(age,sero_mumps,11)
-pollute_age_rubella,pollute_sero_rubella,outliers_rubella = pollute_data(age,sero_rubella,11)
+n_outliers = 11
+pollute_age_measles,pollute_sero_measles,outliers_measles = pollute_data(age,sero_measles,n_outliers)
+pollute_age_mumps,pollute_sero_mumps,outliers_mumps = pollute_data(age,sero_mumps,n_outliers)
+pollute_age_rubella,pollute_sero_rubella,outliers_rubella = pollute_data(age,sero_rubella,n_outliers)
 
 # Graficamos y guardamos 
 plot_seropositive("measles",pollute_age_measles,pollute_sero_measles,outliers_measles)
