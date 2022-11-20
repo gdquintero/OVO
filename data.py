@@ -100,34 +100,19 @@ plot_seropositive("measles",pollute_age_measles,pollute_sero_measles,outliers_me
 plot_seropositive("mumps",pollute_age_mumps,pollute_sero_mumps,outliers_mumps)
 plot_seropositive("rubella",pollute_age_rubella,pollute_sero_rubella,outliers_rubella)
 
-# samples = len(age)
+samples = len(pollute_age_measles)
 
-# with open("output/measles.txt","w") as f:
-#     f.write("%i\n" % samples)
-#     for i in range(samples):
-#         f.write("%i %f\n" % (age[i],sero_measles[i]))
+with open("output/measles.txt","w") as f:
+    f.write("%i\n" % samples)
+    for i in range(samples):
+        f.write("%i %f\n" % (pollute_age_measles[i],pollute_sero_measles[i]))
 
-# with open("output/mumps.txt","w") as f:
-#     f.write("%i\n" % samples)
-#     for i in range(samples):
-#         f.write("%i %f\n" % (age[i],sero_mumps[i]))
+with open("output/mumps.txt","w") as f:
+    f.write("%i\n" % samples)
+    for i in range(samples):
+        f.write("%i %f\n" % (pollute_age_mumps[i],pollute_sero_mumps[i]))
 
-# with open("output/rubella.txt","w") as f:
-#     f.write("%i\n" % samples)
-#     for i in range(samples):
-#         f.write("%i %f\n" % (age[i],sero_rubella[i]))
-
-# plt.plot(age,sero_measles,"o")
-# plt.plot(t,F(t,*sol_measles))
-# plt.show()
-
-# plt.plot(age,sero_mumps,"o")
-# plt.plot(t,F(t,*sol_mumps))
-# plt.show()
-
-# plt.plot(age,sero_rubella,"o")
-# plt.plot(t,F(t,*sol_rubella))
-# plt.show()
-
-# plt.plot(t,l(t,*sol_measles))
-# plt.show()
+with open("output/rubella.txt","w") as f:
+    f.write("%i\n" % samples)
+    for i in range(samples):
+        f.write("%i %f\n" % (pollute_age_rubella[i],pollute_sero_rubella[i]))
