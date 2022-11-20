@@ -41,7 +41,30 @@ sol_rubella = np.array([0.0628,0.178,0.020])
 
 t = np.linspace(0,70,1000)
 
-print(random.sample(range(1, 65), 3))
+n_outliers = 6
+inf = 0.2
+sup = 0.3
+
+# Lista con posibles valores para las edades
+free_ages = []
+
+for i in range(1,age[-1]):
+    if i not in age:
+        free_ages.append(i)
+
+for i in range(n_outliers):
+    # Escogemos una edad de forma aleatoria
+    new_age = random.sample(free_ages,1)[0]
+
+    # Encontramos el indice de la edad mas cercana a la nueva
+    ind = np.where(age < new_age)[0][-1]
+
+    # Insertamos la nueva edad en su posicion correcta
+    age = np.insert(age,ind+1,new_age)
+
+    # Eliminamos la edad recien ingresada en age
+    free_ages.remove(new_age)
+
 
 # Graficar cada una de las proporciones de seropositivos
 # plt.ylim([0,1.1])
