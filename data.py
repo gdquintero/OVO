@@ -20,14 +20,20 @@ def plot_seropositive(sero,x,y,outliers):
     plt.ylim([0,1.1])
     t = np.linspace(0,70,1000)
 
+    plt.plot(x,y,"o",ls=":")
+    plt.plot(outliers[0,:],outliers[1,:],'ro',mfc='none',ms=10)
+
     if sero == "measles":
-        plt.plot(x,y,"o",ls=":")
-        plt.plot(outliers[0,:],outliers[1,:],'ro',mfc='none',ms=10)
         plt.savefig("sero_measles.pdf",bbox_inches = "tight") 
-        plt.show()
+    elif sero == "mumps":
+        plt.savefig("sero_mumps.pdf",bbox_inches = "tight")
+    else:
+        plt.savefig("sero_rubella.pdf",bbox_inches = "tight")
+
+    plt.show()
 
 def pollute_data(age,sero,n_outliers):
-    inf = 0.1
+    inf = 0.2
     sup = 0.3
     outliers = np.empty((2,n_outliers))
     pollute_age = np.copy(age)
@@ -79,14 +85,20 @@ sero_rubella = np.array([
     0.869,0.844,0.852,0.907,0.935,0.921,0.896,0.890,0.949,0.899,0.955,0.937,0.933,0.917
 ])
 
+# Solucion exacta (del paper farrington)
 sol_measles = np.array([0.197,0.287,0.021])
 sol_mumps = np.array([0.156,0.250,0.0])
 sol_rubella = np.array([0.0628,0.178,0.020])
 
-
+# Contaminamos los datos con n_outliers valores atipicos
 pollute_age_measles,pollute_sero_measles,outliers_measles = pollute_data(age,sero_measles,11)
-plot_seropositive("measles",pollute_age_measles,pollute_sero_measles,outliers_measles)
+pollute_age_mumps,pollute_sero_mumps,outliers_mumps = pollute_data(age,sero_mumps,11)
+pollute_age_rubella,pollute_sero_rubella,outliers_rubella = pollute_data(age,sero_rubella,11)
 
+# Graficamos y guardamos 
+plot_seropositive("measles",pollute_age_measles,pollute_sero_measles,outliers_measles)
+plot_seropositive("mumps",pollute_age_mumps,pollute_sero_mumps,outliers_mumps)
+plot_seropositive("rubella",pollute_age_rubella,pollute_sero_rubella,outliers_rubella)
 
 # samples = len(age)
 
