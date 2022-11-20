@@ -16,6 +16,50 @@ def F(t,a,b,c):
     aux = 1.0 - np.exp(aux)
     return aux
 
+def plot_seropositive(sero,x,y,outliers):
+    plt.ylim([0,1.1])
+    t = np.linspace(0,70,1000)
+
+    if sero == "measles":
+        plt.plot(x,y,"o",ls=":")
+        plt.plot(outliers[0,:],outliers[1,:],'ro',mfc='none',ms=10)
+        plt.savefig("sero_measles.pdf",bbox_inches = "tight") 
+        plt.show()
+
+def pollute_data(age,sero,n_outliers):
+    inf = 0.1
+    sup = 0.3
+    outliers = np.empty((2,n_outliers))
+    pollute_age = np.copy(age)
+    pollute_sero = np.copy(sero)
+    
+    # Lista con posibles valores para las edades
+    free_ages = []
+
+    for i in range(1,pollute_age[-1]):
+        if i not in age:
+            free_ages.append(i)
+
+    for i in range(n_outliers):
+        # Escogemos una edad de forma aleatoria
+        new_age = random.sample(free_ages,1)[0]
+
+        # Encontramos el indice de la edad mas cercana a la nueva
+        ind = np.where(pollute_age < new_age)[0][-1]
+
+        # Insertamos la nueva edad y su seropositivo correspondiente
+        pollute_age = np.insert(pollute_age,ind+1,new_age)
+        outlier = F(pollute_age[ind],*sol_measles) - random.uniform(inf,sup)
+        pollute_sero = np.insert(pollute_sero,ind+1,outlier)
+
+        outliers[0,i] = new_age 
+        outliers[1,i] = outlier
+
+        # Eliminamos la edad recien ingresada en age
+        free_ages.remove(new_age)
+
+    return pollute_age,pollute_sero,outliers
+
 age = np.array([
     1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,17,19,21,23,25,27,29,31,33,35,40,45,55,65
 ])
@@ -39,61 +83,10 @@ sol_measles = np.array([0.197,0.287,0.021])
 sol_mumps = np.array([0.156,0.250,0.0])
 sol_rubella = np.array([0.0628,0.178,0.020])
 
-t = np.linspace(0,70,1000)
 
-n_outliers = 11
-inf = 0.1
-sup = 0.3
+pollute_age_measles,pollute_sero_measles,outliers_measles = pollute_data(age,sero_measles,11)
+plot_seropositive("measles",pollute_age_measles,pollute_sero_measles,outliers_measles)
 
-outliers = np.empty((2,n_outliers))
-
-# Lista con posibles valores para las edades
-free_ages = []
-
-for i in range(1,age[-1]):
-    if i not in age:
-        free_ages.append(i)
-
-for i in range(n_outliers):
-    # Escogemos una edad de forma aleatoria
-    new_age = random.sample(free_ages,1)[0]
-
-    # Encontramos el indice de la edad mas cercana a la nueva
-    ind = np.where(age < new_age)[0][-1]
-
-    # Insertamos la nueva edad y su seropositivo correspondiente
-    age = np.insert(age,ind+1,new_age)
-    outlier = F(age[ind],*sol_measles) - random.uniform(inf,sup)
-    sero_measles = np.insert(sero_measles,ind+1,outlier)
-
-    outliers[0,i] = new_age 
-    outliers[1,i] = outlier
-
-    # Eliminamos la edad recien ingresada en age
-    free_ages.remove(new_age)
-
-# plt.plot(age,sero_measles,"o")
-# plt.plot(outliers[0,:],outliers[1,:],'ro',mfc='none',ms=10)
-# plt.show()
-
-
-# Graficar cada una de las proporciones de seropositivos
-plt.ylim([0,1.1])
-plt.plot(age,sero_measles,"o",ls=":")
-plt.plot(outliers[0,:],outliers[1,:],'ro',mfc='none',ms=10)
-# plt.savefig("sero_measles.pdf",bbox_inches = "tight") 
-# plt.close()
-plt.show()
-
-# plt.ylim([0,1.1])
-# plt.plot(age,sero_mumps,"o",ls=":")
-# plt.savefig("sero_mumps.pdf",bbox_inches = "tight") 
-# plt.close()
-
-# plt.ylim([0,1.1])
-# plt.plot(age,sero_rubella,"o",ls=":") 
-# plt.savefig("sero_rubella.pdf",bbox_inches = "tight")  
-# plt.show()
 
 # samples = len(age)
 
