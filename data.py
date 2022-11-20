@@ -43,7 +43,8 @@ t = np.linspace(0,70,1000)
 
 n_outliers = 6
 inf = 0.2
-sup = 0.3
+sup = 0.5
+even_odd = [1,2]
 
 # Lista con posibles valores para las edades
 free_ages = []
@@ -59,11 +60,16 @@ for i in range(n_outliers):
     # Encontramos el indice de la edad mas cercana a la nueva
     ind = np.where(age < new_age)[0][-1]
 
-    # Insertamos la nueva edad en su posicion correcta
+    # Insertamos la nueva edad y su seropositivo correspondiente
     age = np.insert(age,ind+1,new_age)
+    outlier = F(age[ind],*sol_measles) + ((-1.) ** random.sample(even_odd,1)[0]) * random.uniform(inf,sup)
+    sero_measles = np.insert(sero_measles,ind+1,outlier)
 
     # Eliminamos la edad recien ingresada en age
     free_ages.remove(new_age)
+
+plt.plot(age,sero_measles,"o")
+plt.show()
 
 
 # Graficar cada una de las proporciones de seropositivos
