@@ -87,30 +87,30 @@ Program Measles
     end do
 
     ! "Heuristics"
-    q = samples - 11
+    q = samples
 
-    do i = 1, size_delta_grid
-        do j = 1, size_sigmin_grid
-            if (i + j .eq. 2) then
-                call ovo_algorithm(q,delta_grid(1),sigmin_grid(1),fobj,norm_grad)
-                optind_delta = i
-                optind_sigmin = j
-            else 
-                call ovo_algorithm(q,delta_grid(i),sigmin_grid(j),aux,norm_grad)
-                if (aux .lt. fobj) then
-                    fobj = aux
-                    optind_delta = i
-                    optind_sigmin = j
-                    xstar(:) = xk(:)
-                end if
-            end if
-        end do
-    end do
+    ! do i = 1, size_delta_grid
+    !     do j = 1, size_sigmin_grid
+    !         if (i + j .eq. 2) then
+    !             call ovo_algorithm(q,delta_grid(1),sigmin_grid(1),fobj,norm_grad)
+    !             optind_delta = i
+    !             optind_sigmin = j
+    !         else 
+    !             call ovo_algorithm(q,delta_grid(i),sigmin_grid(j),aux,norm_grad)
+    !             if (aux .lt. fobj) then
+    !                 fobj = aux
+    !                 optind_delta = i
+    !                 optind_sigmin = j
+    !                 xstar(:) = xk(:)
+    !             end if
+    !         end if
+    !     end do
+    ! end do
 
-    delta = delta_grid(optind_delta)
-    sigmin = sigmin_grid(optind_sigmin)
+    ! delta = delta_grid(optind_delta)
+    ! sigmin = sigmin_grid(optind_sigmin)
 
-    print*, "Measles: ", delta, sigmin
+    ! print*, "Measles: ", delta, sigmin
 
     ! Open(Unit = 100, File = "output/table_severalq.txt", ACCESS = "SEQUENTIAL")
 
@@ -127,12 +127,15 @@ Program Measles
 
     ! call export(xstar)
 
-    ! call ovo_algorithm(q,delta,sigmin,fobj,norm_grad)
+    delta = 1.0d-4
+    sigmin = 0.1
 
-    ! ! print*, xk
+    call ovo_algorithm(q,delta,sigmin,fobj,norm_grad)
+
+    print*, xk
     ! print*, fobj
 
-    ! call export(xk)
+    call export(xk)
 
     CONTAINS
 
@@ -154,7 +157,7 @@ Program Measles
         real(kind=8)        :: gaux1,gaux2,a,b,c,ebt
 
         ! Initial solution
-        xk(:) = 1.d-1
+        xk(:) = (/0.197d0,0.287d0,0.021d0/)
 
         iter = 0
     
