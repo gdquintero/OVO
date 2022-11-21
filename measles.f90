@@ -87,7 +87,7 @@ Program Measles
     end do
 
     ! "Heuristics"
-    q = samples - 5
+    q = samples - 11
 
     do i = 1, size_delta_grid
         do j = 1, size_sigmin_grid
