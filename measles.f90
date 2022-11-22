@@ -3,7 +3,7 @@ Program Measles
 
     implicit none 
     
-    integer :: allocerr,i,j,k,size_delta_grid,size_sigmin_grid,samples,q 
+    integer :: allocerr,samples,q 
     real(kind=8) :: alpha,epsilon,delta,sigmin,fobj,fxk,fxtrial,ti,norm_grad,sigma
     real(kind=8), allocatable :: xtrial(:),faux(:),indices(:),nu_l(:),nu_u(:),opt_cond(:),&
                                  xstar(:),xk(:),grad(:,:),y(:)
@@ -19,6 +19,8 @@ Program Measles
     logical :: coded(11)
     real(kind=8),   pointer :: l(:),u(:),x(:)
 
+    integer :: i
+
     ! Reading data and storing it in the variables t and y
     Open(Unit = 100, File = "output/measles_outliers.txt", ACCESS = "SEQUENTIAL")
 
@@ -27,8 +29,6 @@ Program Measles
     n = 4
     alpha = 0.5d0
     epsilon = 1.0d-7
-    size_delta_grid = 5
-    size_sigmin_grid = 5
 
     allocate(t(samples),y(samples),x(n),xk(n-1),xtrial(n-1),l(n),u(n),xstar(n-1),&
     faux(samples),indices(samples),Idelta(samples),nu_l(n-1),nu_u(n-1),opt_cond(n-1),stat=allocerr)
