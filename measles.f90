@@ -5,7 +5,7 @@ Program Measles
     
     integer :: allocerr,i,j,k,size_delta_grid,size_sigmin_grid,optind_delta,optind_sigmin,&
                n_iter,n_int_iter,samples,q 
-    real(kind=8) :: alpha,epsilon,delta,sigmin,fobj,fxk,fxtrial,ti,norm_grad,sigma,aux
+    real(kind=8) :: alpha,epsilon,delta,sigmin,fobj,fxk,fxtrial,ti,norm_grad,sigma,aux,error
     real(kind=8), allocatable :: xtrial(:),faux(:),indices(:),nu_l(:),nu_u(:),opt_cond(:),&
                                  delta_grid(:),sigmin_grid(:),xstar(:),xk(:),grad(:,:),y(:)
     integer, allocatable :: Idelta(:),t(:)
@@ -27,7 +27,7 @@ Program Measles
     read(100,*) samples
     n = 4
     alpha = 0.5d0
-    epsilon = 1.0d-4
+    epsilon = 1.0d-7
     size_delta_grid = 5
     size_sigmin_grid = 5
 
@@ -95,6 +95,7 @@ Program Measles
     !             call ovo_algorithm(q,delta_grid(1),sigmin_grid(1),fobj,norm_grad)
     !             optind_delta = i
     !             optind_sigmin = j
+    !             xstar(:) = xk(:)
     !         else 
     !             call ovo_algorithm(q,delta_grid(i),sigmin_grid(j),aux,norm_grad)
     !             if (aux .lt. fobj) then
@@ -106,6 +107,29 @@ Program Measles
     !         end if
     !     end do
     ! end do
+
+    ! do i = 1, size_delta_grid
+    !     do j = 1, size_sigmin_grid
+    !         if (i + j .eq. 2) then
+    !             call ovo_algorithm(q,delta_grid(1),sigmin_grid(1),fobj,norm_grad)
+    !             call quadatic_error(xk,n,error)
+    !             optind_delta = i
+    !             optind_sigmin = j
+    !             xstar(:) = xk(:)
+    !         else 
+    !             call ovo_algorithm(q,delta_grid(i),sigmin_grid(j),aux,norm_grad)
+    !             call quadatic_error(xk,n,aux)
+    !             if (aux .lt. error) then
+    !                 error = aux
+    !                 optind_delta = i
+    !                 optind_sigmin = j
+    !                 xstar(:) = xk(:)
+    !             end if
+    !         end if
+    !     end do
+    ! end do
+
+
 
     ! delta = delta_grid(optind_delta)
     ! sigmin = sigmin_grid(optind_sigmin)
@@ -127,13 +151,16 @@ Program Measles
 
     ! call export(xstar)
 
-    delta = 1.0d-4
-    sigmin = 0.1
+    ! delta = 1.0d-2
+    ! sigmin = 1.0d-1
+
+    ! delta = 1.0d-2
+    ! sigmin = 1.0d-2
+
+    delta = 1.0d-2
+    sigmin = 1.0d-2
 
     call ovo_algorithm(q,delta,sigmin,fobj,norm_grad)
-
-    print*, xk
-    ! print*, fobj
 
     call export(xk)
 
@@ -157,7 +184,8 @@ Program Measles
         real(kind=8)        :: gaux1,gaux2,a,b,c,ebt
 
         ! Initial solution
-        xk(:) = (/0.197d0,0.287d0,0.021d0/)
+        ! xk(:) = (/0.197d0,0.287d0,0.021d0/)
+        xk = 1.0d-1
 
         iter = 0
     
@@ -207,9 +235,9 @@ Program Measles
     
                 grad(i,1) = (1.0d0 / b**2) * (ebt - 1.0d0) + (1.0d0 / b) * (ti * ebt)
     
-                grad(i,2) = (1.0d0 / b**2) * (c - a/b) * (ebt -1)
+                grad(i,2) = (1.0d0 / b**2) * (c - a/b) * (ebt - 1.0d0)
                 grad(i,2) = grad(i,2) - (1.0d0 / b**3) * (a * (ebt - 1.0d0))
-                grad(i,2) = grad(i,2) + (1.0d0 / b) * (ti * ebt * (c - a/b))
+                grad(i,2) = grad(i,2) + (1.0d0 / b) * ti * ebt * (c - a/b)
                 grad(i,2) = grad(i,2) - (1.0d0 / b**2) * (a * ti * ebt)
                 grad(i,2) = grad(i,2) - (1.0d0 / b) * (a * (ti**2) * ebt)
     
@@ -276,7 +304,7 @@ Program Measles
     
             opt_cond(:) = opt_cond(:) + nu_u(:) - nu_l(:)
     
-            ! print*, iter, iter_sub, fxtrial, norm2(opt_cond)
+            print*, iter, iter_sub, fxtrial, norm2(opt_cond)
 
             deallocate(lambda,equatn,linear,grad)
 
@@ -294,6 +322,28 @@ Program Measles
         end do ! End of Main Algorithm
         
     end subroutine
+
+    !==============================================================================
+    ! 
+    !==============================================================================
+    subroutine quadatic_error(x,n,res)
+        implicit none 
+
+        integer,        intent(in) :: n
+        real(kind=8),   intent(in) :: x(n-1)
+        real(kind=8),   intent(out) :: res
+        integer :: i
+        real(kind=8) :: aux
+
+        res = 0.0d0
+
+        do i = 1, samples
+            call model(x,i,n,aux)
+            aux = aux - y(i)
+            res = res + aux**2
+        enddo
+
+    end subroutine quadatic_error
 
     !==============================================================================
     ! EXPORT RESULT TO PLOT
@@ -464,8 +514,8 @@ Program Measles
         ! Compute ind-th constraint
         flag = 0
 
-        c = dot_product(x(1:n-1) - xk(1:n-1),grad(ind,1:n-1)) + (sigma * 0.5d0) * &
-            (norm2(x(1:n-1) - xk(1:n-1))**2) - x(n)
+        c = dot_product(x(1:n-1) - xk(1:n-1),grad(ind,1:n-1)) + &
+            (sigma * 0.5d0) * (norm2(x(1:n-1) - xk(1:n-1))**2) - x(n)
 
     end subroutine myevalc
 
