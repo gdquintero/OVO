@@ -21,7 +21,7 @@ Program Measles
     real(kind=8),   pointer :: l(:),u(:),x(:)
 
     ! Reading data and storing it in the variables t and y
-    Open(Unit = 100, File = "output/measles.txt", ACCESS = "SEQUENTIAL")
+    Open(Unit = 100, File = "output/measles_outliers.txt", ACCESS = "SEQUENTIAL")
 
     ! Set parameters
     read(100,*) samples
@@ -87,7 +87,7 @@ Program Measles
     end do
 
     ! "Heuristics"
-    q = samples
+    q = samples - 11
 
     ! do i = 1, size_delta_grid
     !     do j = 1, size_sigmin_grid
@@ -107,29 +107,6 @@ Program Measles
     !         end if
     !     end do
     ! end do
-
-    ! do i = 1, size_delta_grid
-    !     do j = 1, size_sigmin_grid
-    !         if (i + j .eq. 2) then
-    !             call ovo_algorithm(q,delta_grid(1),sigmin_grid(1),fobj,norm_grad)
-    !             call quadatic_error(xk,n,error)
-    !             optind_delta = i
-    !             optind_sigmin = j
-    !             xstar(:) = xk(:)
-    !         else 
-    !             call ovo_algorithm(q,delta_grid(i),sigmin_grid(j),aux,norm_grad)
-    !             call quadatic_error(xk,n,aux)
-    !             if (aux .lt. error) then
-    !                 error = aux
-    !                 optind_delta = i
-    !                 optind_sigmin = j
-    !                 xstar(:) = xk(:)
-    !             end if
-    !         end if
-    !     end do
-    ! end do
-
-
 
     ! delta = delta_grid(optind_delta)
     ! sigmin = sigmin_grid(optind_sigmin)
@@ -158,6 +135,7 @@ Program Measles
     call export(xk)
 
     CONTAINS
+
 
     !==============================================================================
     ! MAIN ALGORITHM

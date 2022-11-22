@@ -31,7 +31,7 @@ sol_measles = np.array([0.197,0.287,0.021])
 
 plt.plot(df[0].values,df[1].values,"o")
 plt.plot(t,F(t,*x_measles),label="OVO")
-plt.plot(t,F(t,* sol_measles),label="Least Squares")
+plt.plot(t,F(t,*sol_measles),label="Least Squares")
 plt.legend()
 plt.show()
 
