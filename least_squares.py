@@ -14,4 +14,7 @@ def F(t,a,b,c):
 df = pd.read_table("output/measles_outliers.txt",delimiter=" ",header=None,skiprows=1)
 popt, pcov = curve_fit(F,df[0].values,df[1].values,bounds=(0.,np.inf * np.ones(3)))
 
-print(popt)
+with open("output/ls_measles.txt","w") as f:
+    f.write("%f\n" % popt[0])
+    f.write("%f\n" % popt[1])
+    f.write("%f" % popt[2])

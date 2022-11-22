@@ -3,11 +3,10 @@ Program Measles
 
     implicit none 
     
-    integer :: allocerr,i,j,k,size_delta_grid,size_sigmin_grid,optind_delta,optind_sigmin,&
-               n_iter,n_int_iter,samples,q 
-    real(kind=8) :: alpha,epsilon,delta,sigmin,fobj,fxk,fxtrial,ti,norm_grad,sigma,aux,error
+    integer :: allocerr,i,j,k,size_delta_grid,size_sigmin_grid,samples,q 
+    real(kind=8) :: alpha,epsilon,delta,sigmin,fobj,fxk,fxtrial,ti,norm_grad,sigma
     real(kind=8), allocatable :: xtrial(:),faux(:),indices(:),nu_l(:),nu_u(:),opt_cond(:),&
-                                 delta_grid(:),sigmin_grid(:),xstar(:),xk(:),grad(:,:),y(:)
+                                 xstar(:),xk(:),grad(:,:),y(:)
     integer, allocatable :: Idelta(:),t(:)
 
     ! LOCAL SCALARS
@@ -32,8 +31,7 @@ Program Measles
     size_sigmin_grid = 5
 
     allocate(t(samples),y(samples),x(n),xk(n-1),xtrial(n-1),l(n),u(n),xstar(n-1),&
-    faux(samples),indices(samples),delta_grid(size_delta_grid),sigmin_grid(size_sigmin_grid),&
-    Idelta(samples),nu_l(n-1),nu_u(n-1),opt_cond(n-1),stat=allocerr)
+    faux(samples),indices(samples),Idelta(samples),nu_l(n-1),nu_u(n-1),opt_cond(n-1),stat=allocerr)
 
     if ( allocerr .ne. 0 ) then
         write(*,*) 'Allocation error in main program'
@@ -77,41 +75,10 @@ Program Measles
     l(1:n-1) = 0.0d0; l(n) = -1.0d+20
     u(1:n-1) = 1.0d+20; u(n) = 0.0d0
 
-    ! ! Discretization of delta and sigmin
-    do i = 1, size_delta_grid
-        delta_grid(i) = 10.d0**(-i+1)
-    end do
-
-    do i = 1, size_sigmin_grid
-        sigmin_grid(i) = 10.d0**(-i+3)
-    end do
-
-    ! "Heuristics"
     q = samples - 11
 
-    ! do i = 1, size_delta_grid
-    !     do j = 1, size_sigmin_grid
-    !         if (i + j .eq. 2) then
-    !             call ovo_algorithm(q,delta_grid(1),sigmin_grid(1),fobj,norm_grad)
-    !             optind_delta = i
-    !             optind_sigmin = j
-    !             xstar(:) = xk(:)
-    !         else 
-    !             call ovo_algorithm(q,delta_grid(i),sigmin_grid(j),aux,norm_grad)
-    !             if (aux .lt. fobj) then
-    !                 fobj = aux
-    !                 optind_delta = i
-    !                 optind_sigmin = j
-    !                 xstar(:) = xk(:)
-    !             end if
-    !         end if
-    !     end do
-    ! end do
-
-    ! delta = delta_grid(optind_delta)
-    ! sigmin = sigmin_grid(optind_sigmin)
-
-    ! print*, "Measles: ", delta, sigmin
+    delta = 1.0d-2
+    sigmin = 1.0d-2
 
     ! Open(Unit = 100, File = "output/table_severalq.txt", ACCESS = "SEQUENTIAL")
 
@@ -124,13 +91,15 @@ Program Measles
 
     ! close(100)
 
-    ! delta = 1.0d-2
-    ! sigmin = 1.0d-2
-
-    delta = 1.0d-2
-    sigmin = 1.0d-2
+    Open(Unit = 100, File = "output/ls_measles.txt", ACCESS = "SEQUENTIAL")
+    read(100,*) xk(1)
+    read(100,*) xk(2)
+    read(100,*) xk(3)
+    close(100)
 
     call ovo_algorithm(q,delta,sigmin,fobj,norm_grad)
+
+    print*, xk
 
     call export(xk)
 
@@ -156,7 +125,7 @@ Program Measles
 
         ! Initial solution
         ! xk(:) = (/0.197d0,0.287d0,0.021d0/)
-        xk = 1.0d-1
+        ! xk(:) = (/0.2d0,0.3d0,0.02d0/)
 
         iter = 0
     
@@ -280,12 +249,11 @@ Program Measles
             deallocate(lambda,equatn,linear,grad)
 
             fobj = fxtrial
-    
+            fxk = fxtrial
+            xk(1:n-1) = xtrial(1:n-1)
+            
             if (norm2(opt_cond) .le. epsilon) exit
             if (iter .ge. max_iter) exit
-            
-            xk(1:n-1) = xtrial(1:n-1)
-            fxk = fxtrial
     
             call mount_Idelta(faux,indices,delta,Idelta,m)
 
