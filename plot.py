@@ -24,7 +24,7 @@ x_measles = np.zeros(len(xdata))
 for i in range(len(xdata)):
     x_measles[i] = float(xdata[i])
 
-df1 = pd.read_table("output/measles_outliers.txt",delimiter=" ",header=None,skiprows=1)
+df1 = pd.read_table("output/measles_outliers.txt",delimiter=" ",header=None,skiprows=2)
 df2 = pd.read_table("output/measles_only_outliers.txt",delimiter=" ",header=None,skiprows=0)
 df3 = pd.read_table("output/ls_measles.txt",delimiter=" ",header=None,skiprows=0)
 

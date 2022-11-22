@@ -1,4 +1,4 @@
-Program Measles
+Program main
     use sort
 
     implicit none 
@@ -636,4 +636,4 @@ Program Measles
         flag = - 1
 
     end subroutine myevalhlp
-end Program Measles
+end Program main
