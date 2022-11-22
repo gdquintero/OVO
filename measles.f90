@@ -28,7 +28,7 @@ Program Measles
     read(100,*) samples
     n = 4
     alpha = 0.5d0
-    epsilon = 1.0d-7
+    epsilon = 1.0d-4
 
     allocate(t(samples),y(samples),x(n),xk(n-1),xtrial(n-1),l(n),u(n),xstar(n-1),&
     faux(samples),indices(samples),Idelta(samples),nu_l(n-1),nu_u(n-1),opt_cond(n-1),stat=allocerr)
@@ -121,11 +121,12 @@ Program Measles
 
         integer, parameter  :: max_iter = 100000, max_iter_sub = 1000, kflag = 2
         integer             :: iter,iter_sub,i,j
-        real(kind=8)        :: gaux1,gaux2,a,b,c,ebt
+        real(kind=8)        :: gaux1,gaux2,a,b,c,ebt,terminate
 
         ! Initial solution
         ! xk(:) = (/0.197d0,0.287d0,0.021d0/)
-        ! xk(:) = (/0.2d0,0.3d0,0.02d0/)
+        ! xk(:) = (/0.01d0,0.01d0,0.01d0/)
+        xk(:) = -1.d0
 
         iter = 0
     
@@ -243,16 +244,20 @@ Program Measles
             enddo
     
             opt_cond(:) = opt_cond(:) + nu_u(:) - nu_l(:)
+
+            ! terminate = norm2(xk - xtrial)
+            terminate = norm2(opt_cond)
     
-            print*, iter, iter_sub, fxtrial, norm2(opt_cond)
+            print*, iter, iter_sub, fxtrial, terminate
 
             deallocate(lambda,equatn,linear,grad)
 
             fobj = fxtrial
             fxk = fxtrial
+
             xk(1:n-1) = xtrial(1:n-1)
             
-            if (norm2(opt_cond) .le. epsilon) exit
+            if (terminate .le. epsilon) exit
             if (iter .ge. max_iter) exit
     
             call mount_Idelta(faux,indices,delta,Idelta,m)
