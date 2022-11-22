@@ -87,25 +87,15 @@ sero_rubella = np.array([
 
 samples = len(age)
 
-with open("output/measles.txt","w") as f:
+with open("output/seropositives.txt","w") as f:
     f.write("%i\n" % samples)
     for i in range(samples):
-        f.write("%i %f\n" % (age[i],sero_measles[i]))
-
-with open("output/mumps.txt","w") as f:
-    f.write("%i\n" % samples)
-    for i in range(samples):
-        f.write("%i %f\n" % (age[i],sero_mumps[i]))
-
-with open("output/rubella.txt","w") as f:
-    f.write("%i\n" % samples)
-    for i in range(samples):
-        f.write("%i %f\n" % (age[i],sero_rubella[i]))
+        f.write("%i %f %f %f\n" % (age[i],sero_measles[i],sero_mumps[i],sero_rubella[i]))
 
 
 # Solucion exacta (del paper farrington)
 sol_measles = np.array([0.197,0.287,0.021])
-sol_mumps = np.array([0.156,0.250,0.0])
+sol_mumps   = np.array([0.156,0.250,0.0])
 sol_rubella = np.array([0.0628,0.178,0.020])
 
 # Contaminamos los datos con n_outliers valores atipicos
@@ -116,35 +106,18 @@ pollute_age_rubella,pollute_sero_rubella,outliers_rubella = pollute_data(age,ser
 
 samples = len(pollute_age_measles)
 
-with open("output/measles_outliers.txt","w") as f:
+with open("output/seropositives_outliers.txt","w") as f:
     f.write("%i\n" % samples)
     f.write("%i\n" % n_outliers)
     for i in range(samples):
-        f.write("%i %f\n" % (pollute_age_measles[i],pollute_sero_measles[i]))
+        f.write("%i %f %f %f\n" % (pollute_age_measles[i],pollute_sero_measles[i],\
+            pollute_sero_mumps[i],pollute_sero_rubella[i]))
 
-with open("output/mumps_outliers.txt","w") as f:
-    f.write("%i\n" % samples)
-    f.write("%i\n" % n_outliers)
-    for i in range(samples):
-        f.write("%i %f\n" % (pollute_age_mumps[i],pollute_sero_mumps[i]))
-
-with open("output/rubella_outliers.txt","w") as f:
-    f.write("%i\n" % samples)
-    f.write("%i\n" % n_outliers)
-    for i in range(samples):
-        f.write("%i %f\n" % (pollute_age_rubella[i],pollute_sero_rubella[i]))
-
-with open("output/measles_only_outliers.txt","w") as f:
+with open("output/seropositives_only_outliers.txt","w") as f:
     for i in range(n_outliers):
-        f.write("%i %f\n" % (outliers_measles[0,i],outliers_measles[1,i]))
+        f.write("%i %f %i %f %i %f\n" % (outliers_measles[0,i],outliers_measles[1,i],\
+            outliers_mumps[0,i],outliers_mumps[1,i],outliers_rubella[0,i],outliers_rubella[1,i]))
 
-with open("output/mumps_only_outliers.txt","w") as f:
-    for i in range(n_outliers):
-        f.write("%i %f\n" % (outliers_mumps[0,i],outliers_mumps[1,i]))
-
-with open("output/rubella_only_outliers.txt","w") as f:
-    for i in range(n_outliers):
-        f.write("%i %f\n" % (outliers_rubella[0,i],outliers_rubella[1,i]))
 
 # Graficamos y guardamos 
 plot_seropositive("measles",pollute_age_measles,pollute_sero_measles,outliers_measles)

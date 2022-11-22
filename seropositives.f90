@@ -6,8 +6,8 @@ Program main
     integer :: allocerr,samples,q,outliers
     real(kind=8) :: alpha,epsilon,delta,sigmin,fobj,fxk,fxtrial,ti,norm_grad,sigma
     real(kind=8), allocatable :: xtrial(:),faux(:),indices(:),nu_l(:),nu_u(:),opt_cond(:),&
-                                 xstar(:),xk(:),grad(:,:),y(:)
-    integer, allocatable :: Idelta(:),t(:)
+                                 xstar(:),xk(:),grad(:,:),y(:),data(:,:),t(:)
+    integer, allocatable :: Idelta(:)
 
     ! LOCAL SCALARS
     logical :: checkder
@@ -20,9 +20,10 @@ Program main
     real(kind=8),   pointer :: l(:),u(:),x(:)
 
     integer :: i
+    real(kind=8), dimension(3,3) :: solutions
 
     ! Reading data and storing it in the variables t and y
-    Open(Unit = 100, File = "output/measles_outliers.txt", ACCESS = "SEQUENTIAL")
+    Open(Unit = 100, File = "output/seropositives_outliers.txt", ACCESS = "SEQUENTIAL")
 
     ! Set parameters
     read(100,*) samples
@@ -31,9 +32,11 @@ Program main
     n = 4
     alpha = 0.5d0
     epsilon = 1.0d-4
+    delta = 1.0d-2
+    sigmin = 1.0d-2
     q = samples - outliers
 
-    allocate(t(samples),y(samples),x(n),xk(n-1),xtrial(n-1),l(n),u(n),xstar(n-1),&
+    allocate(t(samples),y(samples),x(n),xk(n-1),xtrial(n-1),l(n),u(n),xstar(n-1),data(n,samples),&
     faux(samples),indices(samples),Idelta(samples),nu_l(n-1),nu_u(n-1),opt_cond(n-1),stat=allocerr)
 
     if ( allocerr .ne. 0 ) then
@@ -42,7 +45,8 @@ Program main
     end if
 
     do i = 1, samples
-        read(100,*) t(i), y(i)
+        read(100,*) data(:,i)
+        t(i) = data(1,i)
     enddo
 
     close(100)
@@ -50,7 +54,6 @@ Program main
     ! Coded subroutines
     coded(1:6)  = .true.  ! evalf, evalg, evalh, evalc, evaljac, evalhc
     coded(7:11) = .false. ! evalfc,evalgjac,evalgjacp,evalhl,evalhlp
-
 
     ! Upper bounds on the number of sparse-matrices non-null elements
     jcnnzmax = 10000
@@ -78,9 +81,6 @@ Program main
     l(1:n-1) = 0.0d0; l(n) = -1.0d+20
     u(1:n-1) = 1.0d+20; u(n) = 0.0d0
 
-    delta = 1.d-2
-    sigmin = 1.d-2
-
     ! Open(Unit = 100, File = "output/table_severalq.txt", ACCESS = "SEQUENTIAL")
 
     ! do q = 30, 40
@@ -92,30 +92,42 @@ Program main
 
     ! close(100)
 
-    Open(Unit = 100, File = "output/ls_measles.txt", ACCESS = "SEQUENTIAL")
-    read(100,*) xk(1)
-    read(100,*) xk(2)
-    read(100,*) xk(3)
-    close(100)
+    ! Open(Unit = 100, File = "output/ls_measles.txt", ACCESS = "SEQUENTIAL")
+    ! read(100,*) xk(1)
+    ! read(100,*) xk(2)
+    ! read(100,*) xk(3)
+    ! close(100)
 
-    call ovo_algorithm(q,delta,sigmin,fobj,norm_grad)
+    ! Measles
+    y(:) = data(2,:)
+    call ovo_algorithm(q,delta,sigmin)
+    write(*,*) "Solution for Measles: ", xk
+    solutions(1,:) = xk(:)
 
-    print*, xk
+    ! Mumps
+    y(:) = data(3,:)
+    call ovo_algorithm(q,delta,sigmin)
+    write(*,*) "Solution for Mumps: ", xk
+    solutions(2,:) = xk(:)
 
-    call export(xk)
+    ! Rubella
+    y(:) = data(4,:)
+    call ovo_algorithm(q,delta,sigmin)
+    write(*,*) "Solution for Rubella: ", xk
+    solutions(3,:) = xk(:)
+
+    call export(solutions)
 
     CONTAINS
-
 
     !==============================================================================
     ! MAIN ALGORITHM
     !==============================================================================
-    subroutine ovo_algorithm(q,delta,sigmin,fobj,norm_grad)
+    subroutine ovo_algorithm(q,delta,sigmin)
         implicit none
 
         integer,        intent(in) :: q
         real(kind=8),   intent(in) :: delta, sigmin
-        real(kind=8),   intent(out) :: fobj,norm_grad
 
         logical,        pointer :: equatn(:),linear(:)
         real(kind=8),   pointer :: lambda(:)
@@ -249,11 +261,10 @@ Program main
             ! terminate = norm2(xk - xtrial)
             terminate = norm2(opt_cond)
     
-            print*, iter, iter_sub, fxtrial, terminate, m
+            ! print*, iter, iter_sub, fxtrial, terminate, m
 
             deallocate(lambda,equatn,linear,grad)
 
-            fobj = fxtrial
             fxk = fxtrial
 
             xk(1:n-1) = xtrial(1:n-1)
@@ -296,13 +307,13 @@ Program main
     subroutine export(xsol)
         implicit none
 
-        real(kind=8),   intent(in) :: xsol(n-1)
+        real(kind=8),   intent(in) :: xsol(n-1,n-1)
 
-        Open(Unit = 100, File = "output/xstar_measles.txt", ACCESS = "SEQUENTIAL")
+        Open(Unit = 100, File = "output/solutions_ovo.txt", ACCESS = "SEQUENTIAL")
 
-        write(100,*) xsol(1)
-        write(100,*) xsol(2)
-        write(100,*) xsol(3)
+        write(100,*) xsol(1,1), xsol(1,2), xsol(1,3)
+        write(100,*) xsol(2,1), xsol(2,2), xsol(2,3)
+        write(100,*) xsol(3,1), xsol(3,2), xsol(3,3)
     
         close(100)
 

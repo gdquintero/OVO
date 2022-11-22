@@ -11,10 +11,14 @@ def F(t,a,b,c):
 
     return aux
 
-df = pd.read_table("output/measles_outliers.txt",delimiter=" ",header=None,skiprows=2)
-popt, pcov = curve_fit(F,df[0].values,df[1].values,bounds=(0.,np.inf * np.ones(3)))
+df = pd.read_table("output/seropositives_outliers.txt",delimiter=" ",header=None,skiprows=2)
 
-with open("output/ls_measles.txt","w") as f:
-    f.write("%f\n" % popt[0])
-    f.write("%f\n" % popt[1])
-    f.write("%f" % popt[2])
+popt_measles, pcov_measles  = curve_fit(F,df[0].values,df[1].values,bounds=(0.,np.inf * np.ones(3)))
+popt_mumps, pcov_mumps      = curve_fit(F,df[0].values,df[2].values,bounds=(0.,np.inf * np.ones(3)))
+popt_rubella, pcov_rubella  = curve_fit(F,df[0].values,df[3].values,bounds=(0.,np.inf * np.ones(3)))
+
+with open("output/solutions_ls.txt","w") as f:
+    f.write("%f %f %f\n" % (popt_measles[0],popt_measles[1],popt_measles[2]))
+    f.write("%f %f %f\n" % (popt_mumps[0],popt_mumps[1],popt_mumps[2]))
+    f.write("%f %f %f\n" % (popt_rubella[0],popt_rubella[1],popt_rubella[2]))
+    
