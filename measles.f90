@@ -147,13 +147,6 @@ Program Measles
 
     ! close(100)
 
-    ! print*,xstar
-
-    ! call export(xstar)
-
-    ! delta = 1.0d-2
-    ! sigmin = 1.0d-1
-
     ! delta = 1.0d-2
     ! sigmin = 1.0d-2
 
