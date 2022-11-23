@@ -98,7 +98,7 @@ Program main
     ! Measles
     t(:) = data(1,:)
     y(:) = data(2,:)
-    xk(:) = (/0.2d0,0.2d0,0.01d0/)
+    xk(:) = 0.01d0
     delta = 1.0d-2
     sigmin = 1.0d-2
     call ovo_algorithm(q,delta,sigmin)
@@ -118,7 +118,7 @@ Program main
     ! Rubella
     t(:) = data(5,:)
     y(:) = data(6,:)
-    xk(:) = (/0.01d0,0.1d0,0.01d0/)
+    xk(:) = 1.0d-3
     delta = 1.0d-4
     sigmin = 1.0d-2
     call ovo_algorithm(q,delta,sigmin)
@@ -144,10 +144,6 @@ Program main
         integer, parameter  :: max_iter = 100000, max_iter_sub = 1000, kflag = 2
         integer             :: iter,iter_sub,i,j
         real(kind=8)        :: gaux1,gaux2,a,b,c,ebt,terminate
-
-        ! Initial solution
-        ! xk(:) = (/0.197d0,0.287d0,0.021d0/)
-        ! xk(:) = (/0.01d0,0.01d0,0.01d0/)
 
         iter = 0
     

@@ -24,6 +24,11 @@ def plot_solutions(i):
     plt.plot(t,F(t,*solutions_farrington[i-1]),label="Farrington")
     plt.legend()
     plt.show()
+    plt.plot(t,l(t,*df_solutions_ovo.iloc[i-1].values),label="OVO")
+    plt.plot(t,l(t,*df_solutions_ls.iloc[i-1].values),label="Least Squares")
+    plt.plot(t,l(t,*solutions_farrington[i-1]),label="Farrington")
+    plt.legend()
+    plt.show()
 
 df_sero_outliers = pd.read_table("output/seropositives_outliers.txt",delimiter=" ",header=None,skiprows=2)
 df_only_outliers = pd.read_table("output/seropositives_only_outliers.txt",delimiter=" ",header=None,skiprows=0)
@@ -40,5 +45,5 @@ t = np.linspace(0,70,1000)
 
 # Plotamos las soluciones 1:Measles, 2:Mumps, 3:Rubella
 plot_solutions(1)
-plot_solutions(2)
-plot_solutions(3)
+# plot_solutions(2)
+# plot_solutions(3)
