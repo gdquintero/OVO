@@ -311,9 +311,11 @@ Program main
 
         Open(Unit = 100, File = "output/solutions_ovo.txt", ACCESS = "SEQUENTIAL")
 
-        write(100,*) xsol(1,1), xsol(1,2), xsol(1,3)
-        write(100,*) xsol(2,1), xsol(2,2), xsol(2,3)
-        write(100,*) xsol(3,1), xsol(3,2), xsol(3,3)
+        write(100,110) xsol(1,1), xsol(1,2), xsol(1,3)
+        write(100,110) xsol(2,1), xsol(2,2), xsol(2,3)
+        write(100,110) xsol(3,1), xsol(3,2), xsol(3,3)
+
+        110 format (F8.6,1X,F8.6,1X,F8.6)
     
         close(100)
 

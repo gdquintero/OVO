@@ -120,7 +120,7 @@ with open("output/seropositives_only_outliers.txt","w") as f:
 
 
 # Graficamos y guardamos 
-plot_seropositive("measles",pollute_age_measles,pollute_sero_measles,outliers_measles)
-plot_seropositive("mumps",pollute_age_mumps,pollute_sero_mumps,outliers_mumps)
-plot_seropositive("rubella",pollute_age_rubella,pollute_sero_rubella,outliers_rubella)
+# plot_seropositive("measles",pollute_age_measles,pollute_sero_measles,outliers_measles)
+# plot_seropositive("mumps",pollute_age_mumps,pollute_sero_mumps,outliers_mumps)
+# plot_seropositive("rubella",pollute_age_rubella,pollute_sero_rubella,outliers_rubella)
 
