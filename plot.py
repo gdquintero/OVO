@@ -15,9 +15,10 @@ def F(t,a,b,c):
     aux = 1.0 - np.exp(aux)
     return aux
 
-def plot_solutions(ind):
-    plt.plot(df_sero_outliers[0].values,df_sero_outliers[ind].values,"o")
-    plt.plot(df_only_outliers[2*(ind-1)].values,df_only_outliers[2*ind-1].values,'ro',mfc='none',ms=10)
+def plot_solutions(i):
+    ind = 2*i-1
+    plt.plot(df_sero_outliers[ind-1].values,df_sero_outliers[ind].values,"o")
+    plt.plot(df_only_outliers[ind-1].values,df_only_outliers[ind].values,'ro',mfc='none',ms=10)
     plt.show()
 
 df_sero_outliers = pd.read_table("output/seropositives_outliers.txt",delimiter=" ",header=None,skiprows=2)
@@ -41,7 +42,6 @@ plot_solutions(3)
 # plt.plot(t,F(t,*sol_measles),label="Farrington")
 # plt.plot(t,F(t,*df3.values),label="Least Squares")
 # plt.legend()
-
 
 # plt.plot(t,l(t,*x_measles),label="OVO")
 # plt.plot(t,l(t,*sol_measles),label="Farrington")

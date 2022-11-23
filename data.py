@@ -110,8 +110,8 @@ with open("output/seropositives_outliers.txt","w") as f:
     f.write("%i\n" % samples)
     f.write("%i\n" % n_outliers)
     for i in range(samples):
-        f.write("%i %f %f %f\n" % (pollute_age_measles[i],pollute_sero_measles[i],\
-            pollute_sero_mumps[i],pollute_sero_rubella[i]))
+        f.write("%i %f %i %f %i %f\n" % (pollute_age_measles[i],pollute_sero_measles[i],\
+            pollute_age_mumps[i],pollute_sero_mumps[i],pollute_age_rubella[i],pollute_sero_rubella[i]))
 
 with open("output/seropositives_only_outliers.txt","w") as f:
     for i in range(n_outliers):
