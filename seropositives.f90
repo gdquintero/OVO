@@ -98,7 +98,8 @@ Program main
     ! Measles
     t(:) = data(1,:)
     y(:) = data(2,:)
-    xk(:) = 0.01d0
+    xk(:) = (/0.197d0,0.287d0,0.021d0/)
+    xk(:) = 1.0d0
     delta = 1.0d-2
     sigmin = 1.0d-2
     call ovo_algorithm(q,delta,sigmin)
@@ -108,8 +109,9 @@ Program main
     ! Mumps
     t(:) = data(3,:)
     y(:) = data(4,:)
-    xk(:) = (/0.1d0,0.2d0,0.0d0/)
-    delta = 1.0d-4
+    xk(:) = (/0.156d0,0.250d0,0.0d0/)
+    xk(:) = 1.0d0
+    delta = 1.0d-2
     sigmin = 1.0d-2
     call ovo_algorithm(q,delta,sigmin)
     print*,"Solution mumps: ",xk
@@ -118,8 +120,9 @@ Program main
     ! Rubella
     t(:) = data(5,:)
     y(:) = data(6,:)
-    xk(:) = 1.0d-3
-    delta = 1.0d-4
+    xk(:) = (/0.0628d0,0.178d0,0.020d0/)
+    xk(:) = 1.0d0
+    delta = 1.0d-2
     sigmin = 1.0d-2
     call ovo_algorithm(q,delta,sigmin)
     print*,"Solution rubella: ",xk
