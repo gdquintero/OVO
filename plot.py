@@ -1,19 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-
-def l(t,a,b,c):
-    aux = a * t - c
-    aux = aux * np.exp(-b * t)
-    aux = aux + c
-    return aux
-
-def F(t,a,b,c):
-    aux = (a/b) * t * np.exp(-b * t)
-    aux = aux + (1.0/b) * ((a/b) - c) * (np.exp(-b * t) - 1.0)
-    aux = aux - c * t
-    aux = 1.0 - np.exp(aux)
-    return aux
+import models
 
 def plot_solutions(i):
     ind = 2*i-1

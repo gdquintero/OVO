@@ -1,27 +1,12 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import random
 
-def l(t,a,b,c):
-    aux = a * t - c
-    aux = aux * np.exp(-b * t)
-    aux = aux + c
-    return aux
-
-def F(t,a,b,c):
-    aux = (a/b) * t * np.exp(-b * t)
-    aux = aux + (1.0/b) * ((a/b) - c) * (np.exp(-b * t) - 1.0)
-    aux = aux - c * t
-    aux = 1.0 - np.exp(aux)
-    return aux
-
-def plot_seropositive(sero,x,y,outliers):
+def plot_seropositive(sero,x,y):
     plt.ylim([0,1.1])
-    t = np.linspace(0,70,1000)
+    # t = np.linspace(0,70,1000)
 
     plt.plot(x,y,"o",ls=":")
-    plt.plot(outliers[0,:],outliers[1,:],'ro',mfc='none',ms=10)
 
     if sero == "measles":
         plt.savefig("sero_measles.pdf",bbox_inches = "tight") 
@@ -31,40 +16,6 @@ def plot_seropositive(sero,x,y,outliers):
         plt.savefig("sero_rubella.pdf",bbox_inches = "tight")
 
     plt.show()
-
-def pollute_data(age,sero,n_outliers):
-    inf = 0.2
-    sup = 0.3
-    outliers = np.empty((2,n_outliers))
-    pollute_age = np.copy(age)
-    pollute_sero = np.copy(sero)
-    
-    # Lista con posibles valores para las edades
-    free_ages = []
-
-    for i in range(1,pollute_age[-1]):
-        if i not in age:
-            free_ages.append(i)
-
-    for i in range(n_outliers):
-        # Escogemos una edad de forma aleatoria
-        new_age = random.sample(free_ages,1)[0]
-
-        # Encontramos el indice de la edad mas cercana a la nueva
-        ind = np.where(pollute_age < new_age)[0][-1]
-
-        # Insertamos la nueva edad y su seropositivo correspondiente
-        pollute_age = np.insert(pollute_age,ind+1,new_age)
-        outlier = F(pollute_age[ind],*sol_measles) - random.uniform(inf,sup)
-        pollute_sero = np.insert(pollute_sero,ind+1,outlier)
-
-        outliers[0,i] = new_age 
-        outliers[1,i] = outlier
-
-        # Eliminamos la edad recien ingresada en age
-        free_ages.remove(new_age)
-
-    return pollute_age,pollute_sero,outliers
 
 age = np.array([
     1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,17,19,21,23,25,27,29,31,33,35,40,45,55,65
@@ -98,29 +49,6 @@ sol_measles = np.array([0.197,0.287,0.021])
 sol_mumps   = np.array([0.156,0.250,0.0])
 sol_rubella = np.array([0.0628,0.178,0.020])
 
-# Contaminamos los datos con n_outliers valores atipicos
-n_outliers = 5
-pollute_age_measles,pollute_sero_measles,outliers_measles = pollute_data(age,sero_measles,n_outliers)
-pollute_age_mumps,pollute_sero_mumps,outliers_mumps = pollute_data(age,sero_mumps,n_outliers)
-pollute_age_rubella,pollute_sero_rubella,outliers_rubella = pollute_data(age,sero_rubella,n_outliers)
-
-samples = len(pollute_age_measles)
-
-with open("output/seropositives_outliers.txt","w") as f:
-    f.write("%i\n" % samples)
-    f.write("%i\n" % n_outliers)
-    for i in range(samples):
-        f.write("%i %f %i %f %i %f\n" % (pollute_age_measles[i],pollute_sero_measles[i],\
-            pollute_age_mumps[i],pollute_sero_mumps[i],pollute_age_rubella[i],pollute_sero_rubella[i]))
-
-with open("output/seropositives_only_outliers.txt","w") as f:
-    for i in range(n_outliers):
-        f.write("%i %f %i %f %i %f\n" % (outliers_measles[0,i],outliers_measles[1,i],\
-            outliers_mumps[0,i],outliers_mumps[1,i],outliers_rubella[0,i],outliers_rubella[1,i]))
-
-
-# Graficamos y guardamos 
-# plot_seropositive("measles",pollute_age_measles,pollute_sero_measles,outliers_measles)
-# plot_seropositive("mumps",pollute_age_mumps,pollute_sero_mumps,outliers_mumps)
-# plot_seropositive("rubella",pollute_age_rubella,pollute_sero_rubella,outliers_rubella)
-
+plot_seropositive("measles",age,sero_measles)
+plot_seropositive("mumps",age,sero_mumps)
+plot_seropositive("rubella",age,sero_rubella)
