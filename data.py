@@ -50,5 +50,5 @@ sol_mumps   = np.array([0.156,0.250,0.0])
 sol_rubella = np.array([0.0628,0.178,0.020])
 
 plot_seropositive("measles",age,sero_measles)
-plot_seropositive("mumps",age,sero_mumps)
-plot_seropositive("rubella",age,sero_rubella)
+# plot_seropositive("mumps",age,sero_mumps)
+# plot_seropositive("rubella",age,sero_rubella)
