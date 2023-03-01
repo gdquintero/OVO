@@ -3,8 +3,8 @@ Program main
 
     implicit none 
     
-    integer :: allocerr,samples,q,outliers
-    real(kind=8) :: alpha,epsilon,delta,sigmin,fxk,fxtrial,ti,sigma
+    integer :: allocerr,samples,q
+    real(kind=8) :: delta,sigmin,fxk,fxtrial,ti,sigma
     real(kind=8), allocatable :: xtrial(:),faux(:),indices(:),nu_l(:),nu_u(:),opt_cond(:),&
                                  xstar(:),y(:),data(:,:),t(:)
     integer, allocatable :: Idelta(:)
@@ -32,9 +32,6 @@ Program main
     read(100,*) samples
 
     n = 4
-    alpha = 0.5d0
-    epsilon = 1.0d-4
-    q = samples - 4
 
     allocate(t(samples),y(samples),x(n),xk(n-1),xtrial(n-1),l(n),u(n),xstar(n-1),data(4,samples),&
     faux(samples),indices(samples),Idelta(samples),nu_l(n-1),nu_u(n-1),opt_cond(n-1),stat=allocerr)
@@ -100,38 +97,16 @@ Program main
     ! read(100,*) xk(3)
     ! close(100)
 
+    q = samples - 1
     solutions(:,:) = 0.0d0
 
     ! Measles
     y(:) = data(2,:)
-    ! xk(:) = (/0.197d0,0.287d0,0.021d0/)
-    delta = 1.0d-2
+    delta = 1.0d-4
     sigmin = 1.0d-2
     call ovo_algorithm(q,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial)
     print*,"Solution measles: ",xk
     solutions(1,:) = xk(:)
-
-    ! ! Mumps
-    ! t(:) = data(3,:)
-    ! y(:) = data(4,:)
-    ! xk(:) = (/0.156d0,0.250d0,0.0d0/)
-    ! xk(:) = 1.0d0
-    ! delta = 1.0d-2
-    ! sigmin = 1.0d-2
-    ! call ovo_algorithm(q,delta,sigmin)
-    ! print*,"Solution mumps: ",xk
-    ! solutions(2,:) = xk(:)
-
-    ! ! Rubella
-    ! t(:) = data(5,:)
-    ! y(:) = data(6,:)
-    ! xk(:) = (/0.0628d0,0.178d0,0.020d0/)
-    ! xk(:) = 1.0d0
-    ! delta = 1.0d-2
-    ! sigmin = 1.0d-2
-    ! call ovo_algorithm(q,delta,sigmin)
-    ! print*,"Solution rubella: ",xk
-    ! solutions(3,:) = xk(:)
 
     call export(solutions)
 
@@ -150,7 +125,10 @@ Program main
 
         integer, parameter  :: max_iter = 100000, max_iter_sub = 1000, kflag = 2
         integer             :: iter,iter_sub,i,j
-        real(kind=8)        :: gaux1,gaux2,a,b,c,ebt,terminate
+        real(kind=8)        :: gaux1,gaux2,a,b,c,ebt,terminate,alpha,epsilon
+
+        alpha = 0.5d0
+        epsilon = 1.0d-4
 
         iter = 0
 

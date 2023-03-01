@@ -3,11 +3,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import models
 
-def plot_solutions(i,df_sero,df_sol):
+def plot_solutions(i,df_seropositives,df_sol):
     t = np.linspace(0,70,1000)
-    plt.plot(df_seropositives[0].values,df_sero[i].values,"o")
-    # plt.plot(t,models.F(t,*solutions_farrington[i]),label="Farrington")
-    plt.plot(t,models.F(t,*df_sol.iloc[i].values),label="OVO")
+    plt.plot(df_seropositives[0].values,df_seropositives[i].values,"o")
+    plt.plot(t,models.F(t,*solutions_farrington[i-1]),label="Farrington")
+    plt.plot(t,models.F(t,*df_sol.iloc[i-1].values),label="OVO")
     plt.legend()
     plt.show()
 
@@ -24,5 +24,3 @@ solutions_farrington = np.array([
 
 # Plotamos las soluciones 1:Measles, 2:Mumps, 3:Rubella
 plot_solutions(1,df_seropositives,df_solutions_ovo)
-# plot_solutions(2)
-# plot_solutions(3)
