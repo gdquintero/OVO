@@ -139,7 +139,6 @@ Program main
 
         iter = 0
 
-        ! xk(:) = 1.0d0
         xk(:) = 0.1d0
     
         indices(:) = (/(i, i = 1, samples)/)
