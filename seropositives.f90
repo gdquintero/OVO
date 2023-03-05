@@ -97,7 +97,7 @@ Program main
     ! read(100,*) xk(3)
     ! close(100)
 
-    q = samples - 5
+    q = samples - 4
     solutions(:,:) = 0.0d0
 
     ! Measles
