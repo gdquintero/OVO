@@ -24,4 +24,6 @@ solutions_farrington = np.array([
 
 # Plotamos las soluciones 1:Measles, 2:Mumps, 3:Rubella
 plot_solutions(1,df_seropositives,df_solutions_ovo)
+plot_solutions(2,df_seropositives,df_solutions_ovo)
+plot_solutions(3,df_seropositives,df_solutions_ovo)
 

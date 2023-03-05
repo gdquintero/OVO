@@ -80,33 +80,40 @@ Program main
     l(1:n-1) = 0.0d0; l(n) = -1.0d+20
     u(1:n-1) = 1.0d+20; u(n) = 0.0d0
 
-    ! Open(Unit = 100, File = "output/table_severalq.txt", ACCESS = "SEQUENTIAL")
-
-    ! do q = 30, 40
-    !     call ovo_algorithm(q,delta_grid(optind_delta),sigmin_grid(optind_sigmin),fobj,norm_grad)
-    !     print*, q, xk, fobj, norm_grad
-    !     write(100,10) q,'&',xk(1),'&',xk(2),'&',xk(3),'&',xk(4),'&',fobj,'&',n_iter,'\\'
-    !     10 format (I2,1X,A1,1X,F10.6,1X,A1,1X,F10.6,1X,A1,1X,F10.6,1X,A1,1X,F10.6,1X,A1,1X,F10.6,1X,A1,1X,I3,1X,A2)
-    ! end do
-
-    ! close(100)
-
-    ! Open(Unit = 100, File = "output/ls_measles.txt", ACCESS = "SEQUENTIAL")
-    ! read(100,*) xk(1)
-    ! read(100,*) xk(2)
-    ! read(100,*) xk(3)
-    ! close(100)
-
-    q = samples - 4
+    q = samples - 5
     solutions(:,:) = 0.0d0
 
+    print*,"----------------------------------------------------------------------------"
+    Print*, "Measles"
+    print*,"----------------------------------------------------------------------------"
     ! Measles
     y(:) = data(2,:)
     delta = 1.0d-4
     sigmin = 1.0d-2
     call ovo_algorithm(q,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial)
     print*,"Solution measles: ",xk
+    print*,"----------------------------------------------------------------------------"
     solutions(1,:) = xk(:)
+
+    ! Mumps
+    Print*, "Mumps"
+    print*,"----------------------------------------------------------------------------"
+    q = samples - 5
+    y(:) = data(3,:)
+    call ovo_algorithm(q,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial)
+    print*,"Solution mumps: ",xk
+    print*,"----------------------------------------------------------------------------"
+    solutions(2,:) = xk(:)
+
+    ! Rubella
+    Print*, "Rubella"
+    print*,"----------------------------------------------------------------------------"
+    q = samples - 5
+    y(:) = data(4,:)
+    call ovo_algorithm(q,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial)
+    print*,"Solution rubella: ",xk
+    print*,"----------------------------------------------------------------------------"
+    solutions(3,:) = xk(:)
 
     call export(solutions)
 
