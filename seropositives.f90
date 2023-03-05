@@ -97,7 +97,7 @@ Program main
     ! read(100,*) xk(3)
     ! close(100)
 
-    q = samples - 1
+    q = samples - 5
     solutions(:,:) = 0.0d0
 
     ! Measles
@@ -132,7 +132,8 @@ Program main
 
         iter = 0
 
-        xk(:) = 1.0d0
+        ! xk(:) = 1.0d0
+        xk(:) = 0.1d0
     
         indices(:) = (/(i, i = 1, samples)/)
     
