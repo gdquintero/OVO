@@ -83,36 +83,38 @@ Program main
     q = samples - 5
     solutions(:,:) = 0.0d0
 
-    print*,"----------------------------------------------------------------------------"
-    Print*, "Measles"
-    print*,"----------------------------------------------------------------------------"
     ! Measles
+    print*
+    Print*, "OVO Algorithm for Measles"
+    print*,"-------------------------------------------------------------------"
     y(:) = data(2,:)
     delta = 1.0d-4
     sigmin = 1.0d-2
     call ovo_algorithm(q,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial)
-    print*,"Solution measles: ",xk
-    print*,"----------------------------------------------------------------------------"
+    ! print*,"Solution measles: ",xk
+    print*,"-------------------------------------------------------------------"
     solutions(1,:) = xk(:)
 
     ! Mumps
-    Print*, "Mumps"
-    print*,"----------------------------------------------------------------------------"
+    print*
+    Print*, "OVO Algorithm for Mumps"
+    print*,"-------------------------------------------------------------------"
     q = samples - 5
     y(:) = data(3,:)
     call ovo_algorithm(q,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial)
-    print*,"Solution mumps: ",xk
-    print*,"----------------------------------------------------------------------------"
+    ! print*,"Solution mumps: ",xk
+    print*,"-------------------------------------------------------------------"
     solutions(2,:) = xk(:)
 
     ! Rubella
-    Print*, "Rubella"
-    print*,"----------------------------------------------------------------------------"
+    print*
+    Print*, "OVO Algorithm for Rubella"
+    print*,"-------------------------------------------------------------------"
     q = samples - 5
     y(:) = data(4,:)
     call ovo_algorithm(q,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial)
-    print*,"Solution rubella: ",xk
-    print*,"----------------------------------------------------------------------------"
+    ! print*,"Solution rubella: ",xk
+    print*,"-------------------------------------------------------------------"
     solutions(3,:) = xk(:)
 
     call export(solutions)
@@ -155,6 +157,10 @@ Program main
         fxk = faux(q)
     
         call mount_Idelta(faux,delta,indices,samples,Idelta,m)
+
+        write(*,10) "Iterations","Inter. Iter.","Objective func.","Optimality cond.","Idelta"
+        10 format (A11,2X,A12,2X,A15,2X,A16,2X,A6)
+        print*,"-------------------------------------------------------------------"
 
         do
             iter = iter + 1
@@ -258,8 +264,9 @@ Program main
 
             ! terminate = norm2(xk - xtrial)
             terminate = norm2(opt_cond)
-    
-            print*, iter, iter_sub, fxtrial, terminate, m
+
+            write(*,20)  iter,iter_sub,fxtrial,terminate,m
+            20 format (3X,I3,10X,I3,7X,ES14.6,4X,ES14.6,6X,I2)
 
             deallocate(lambda,equatn,linear,grad)
 
@@ -290,7 +297,7 @@ Program main
     !     integer :: i
     !     real(kind=8) :: aux
 
-    !     res = 0.0d0
+    !     res = 0.0d090
 
     !     do i = 1, samples
     !         call model(x,i,n,aux)
