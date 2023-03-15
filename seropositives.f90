@@ -3,11 +3,11 @@ Program main
 
     implicit none 
     
-    integer :: allocerr,samples,q
+    integer :: allocerr,samples,q,noutliers
     real(kind=8) :: delta,sigmin,fxk,fxtrial,ti,sigma
     real(kind=8), allocatable :: xtrial(:),faux(:),indices(:),nu_l(:),nu_u(:),opt_cond(:),&
                                  xstar(:),y(:),data(:,:),t(:)
-    integer, allocatable :: Idelta(:)
+    integer, allocatable :: Idelta(:),outliers(:)
 
     ! LOCAL SCALARS
     logical :: checkder
@@ -32,11 +32,12 @@ Program main
     read(100,*) samples
 
     n = 4
-
-print*, "hola"
+    noutliers = 5
+    q = samples - noutliers
 
     allocate(t(samples),y(samples),x(n),xk(n-1),xtrial(n-1),l(n),u(n),xstar(n-1),data(4,samples),&
-    faux(samples),indices(samples),Idelta(samples),nu_l(n-1),nu_u(n-1),opt_cond(n-1),stat=allocerr)
+    faux(samples),indices(samples),Idelta(samples),nu_l(n-1),nu_u(n-1),opt_cond(n-1),&
+    outliers(3*noutliers),stat=allocerr)
 
     if ( allocerr .ne. 0 ) then
         write(*,*) 'Allocation error in main program'
@@ -82,7 +83,6 @@ print*, "hola"
     l(1:n-1) = 0.0d0; l(n) = -1.0d+20
     u(1:n-1) = 1.0d+20; u(n) = 0.0d0
 
-    q = samples - 5
     solutions(:,:) = 0.0d0
 
     ! Measles
@@ -92,7 +92,7 @@ print*, "hola"
     y(:) = data(2,:)
     delta = 1.0d-4
     sigmin = 1.0d-2
-    call ovo_algorithm(q,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial)
+    call ovo_algorithm(q,noutliers,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
     ! print*,"Solution measles: ",xk
     print*,"-------------------------------------------------------------------"
     solutions(1,:) = xk(:)
@@ -103,7 +103,7 @@ print*, "hola"
     print*,"-------------------------------------------------------------------"
     q = samples - 5
     y(:) = data(3,:)
-    call ovo_algorithm(q,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial)
+    call ovo_algorithm(q,noutliers,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial,outliers(noutliers+1:2*noutliers))
     ! print*,"Solution mumps: ",xk
     print*,"-------------------------------------------------------------------"
     solutions(2,:) = xk(:)
@@ -114,25 +114,26 @@ print*, "hola"
     print*,"-------------------------------------------------------------------"
     q = samples - 5
     y(:) = data(4,:)
-    call ovo_algorithm(q,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial)
+    call ovo_algorithm(q,noutliers,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial,outliers(2*noutliers+1:3*noutliers))
     ! print*,"Solution rubella: ",xk
     print*,"-------------------------------------------------------------------"
     solutions(3,:) = xk(:)
 
-    call export(solutions)
+    call export(solutions,outliers,noutliers)
 
     CONTAINS
 
     !==============================================================================
     ! MAIN ALGORITHM
     !==============================================================================
-    subroutine ovo_algorithm(q,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial)
+    subroutine ovo_algorithm(q,noutliers,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial,outliers)
         implicit none
 
-        integer,        intent(in) :: q,samples,n
+        integer,        intent(in) :: q,noutliers,samples,n
         real(kind=8),   intent(in) :: delta,sigmin,t(samples),y(samples)
         integer,        intent(inout) :: Idelta(samples),m
         real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1)
+        integer,        intent(inout) :: outliers(noutliers)
 
         integer, parameter  :: max_iter = 100000, max_iter_sub = 1000, kflag = 2
         integer             :: iter,iter_sub,i,j
@@ -281,9 +282,10 @@ print*, "hola"
             if (iter .ge. max_iter) exit
     
             call mount_Idelta(faux,delta,indices,samples,Idelta,m)
-
-    
+            
         end do ! End of Main Algorithm
+
+        outliers(:) = int(indices(samples - noutliers + 1:))
         
     end subroutine
 
@@ -312,10 +314,13 @@ print*, "hola"
     !==============================================================================
     ! EXPORT RESULT TO PLOT
     !==============================================================================
-    subroutine export(xsol)
+    subroutine export(xsol,outliers,noutliers)
         implicit none
 
+        integer,        intent(in) :: noutliers,outliers(3*noutliers)
         real(kind=8),   intent(in) :: xsol(n-1,n-1)
+
+        integer :: i
 
         Open(Unit = 100, File = "output/solutions_ovo.txt", ACCESS = "SEQUENTIAL")
 
@@ -326,6 +331,18 @@ print*, "hola"
         110 format (F8.6,1X,F8.6,1X,F8.6)
     
         close(100)
+
+        Open(Unit = 200, File = "output/outliers.txt", ACCESS = "SEQUENTIAL")
+
+        write(200,210) noutliers
+
+        do i = 1, 3*noutliers
+            write(200,210) outliers(i)
+        enddo
+
+        210 format (I2)
+
+        close(200)
 
     end subroutine export
 
