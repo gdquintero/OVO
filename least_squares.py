@@ -12,5 +12,5 @@ popt_rubella, pcov_rubella  = curve_fit(models.F,df[0].values,df[3].values,bound
 with open("output/solutions_ls.txt","w") as f:
     f.write("%f %f %f\n" % (popt_measles[0],popt_measles[1],popt_measles[2]))
     f.write("%f %f %f\n" % (popt_mumps[0],popt_mumps[1],popt_mumps[2]))
-    f.write("%f %f %f\n" % (popt_rubella[0],popt_rubella[1],popt_rubella[2]))
+    f.write("%f %f %f\n" % (popt_rubella[0],popt_rubella[1],popt_rubella[2])) 
     

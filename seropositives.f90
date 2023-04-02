@@ -32,7 +32,7 @@ Program main
     read(100,*) samples
 
     n = 4
-    noutliers = 5
+    noutliers = 0
     q = samples - noutliers
 
     allocate(t(samples),y(samples),x(n),xk(n-1),xtrial(n-1),l(n),u(n),xstar(n-1),data(4,samples),&
@@ -98,25 +98,25 @@ Program main
     solutions(1,:) = xk(:)
 
     ! Mumps
-    print*
-    Print*, "OVO Algorithm for Mumps"
-    print*,"-------------------------------------------------------------------"
-    q = samples - 5
-    y(:) = data(3,:)
-    call ovo_algorithm(q,noutliers,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial,outliers(noutliers+1:2*noutliers))
-    ! print*,"Solution mumps: ",xk
-    print*,"-------------------------------------------------------------------"
-    solutions(2,:) = xk(:)
+    ! print*
+    ! Print*, "OVO Algorithm for Mumps"
+    ! print*,"-------------------------------------------------------------------"
+    ! q = samples - 5
+    ! y(:) = data(3,:)
+    ! call ovo_algorithm(q,noutliers,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial,outliers(noutliers+1:2*noutliers))
+    ! ! print*,"Solution mumps: ",xk
+    ! print*,"-------------------------------------------------------------------"
+    ! solutions(2,:) = xk(:)
 
-    ! Rubella
-    print*
-    Print*, "OVO Algorithm for Rubella"
-    print*,"-------------------------------------------------------------------"
-    q = samples - 5
-    y(:) = data(4,:)
-    call ovo_algorithm(q,noutliers,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial,outliers(2*noutliers+1:3*noutliers))
-    ! print*,"Solution rubella: ",xk
-    print*,"-------------------------------------------------------------------"
+    ! ! Rubella
+    ! print*
+    ! Print*, "OVO Algorithm for Rubella"
+    ! print*,"-------------------------------------------------------------------"
+    ! q = samples - 5
+    ! y(:) = data(4,:)
+    ! call ovo_algorithm(q,noutliers,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial,outliers(2*noutliers+1:3*noutliers))
+    ! ! print*,"Solution rubella: ",xk
+    ! print*,"-------------------------------------------------------------------"
     solutions(3,:) = xk(:)
 
     call export(solutions,outliers,noutliers)
@@ -139,13 +139,11 @@ Program main
         integer             :: iter,iter_sub,i,j
         real(kind=8)        :: gaux1,gaux2,a,b,c,ebt,terminate,alpha,epsilon
 
-        alpha = 0.5d0
+        alpha   = 0.5d0
         epsilon = 1.0d-4
-
-        iter = 0
-
-        xk(:) = 0.1d0
-    
+        iter    = 0
+        ! xk(:)   = 0.1d0
+        xk(:) = (/9.109573d0, 19.345421d0, 0.202798d0/)
         indices(:) = (/(i, i = 1, samples)/)
     
         ! Scenarios
@@ -208,10 +206,8 @@ Program main
             end do
     
             sigma = sigmin
-    
             iter_sub = 1
             x(:) = (/xk(:),0.0d0/)
-            ! x = 0.0d0
     
             ! Minimizing using ALGENCAN
             do 
@@ -222,7 +218,6 @@ Program main
                     checkder,f,cnorm,snorm,nlpsupn,inform)
 
                 xtrial(1:n-1) = x(1:n-1)
-    
                 indices(:) = (/(i, i = 1, samples)/)
     
                 ! Scenarios
@@ -264,8 +259,6 @@ Program main
             enddo
     
             opt_cond(:) = opt_cond(:) + nu_u(:) - nu_l(:)
-
-            ! terminate = norm2(xk - xtrial)
             terminate = norm2(opt_cond)
 
             write(*,20)  iter,iter_sub,fxtrial,terminate,m
@@ -274,11 +267,31 @@ Program main
             deallocate(lambda,equatn,linear,grad)
 
             fxk = fxtrial
-
             xk(1:n-1) = xtrial(1:n-1)
 
+
+
+            if (terminate .le. epsilon) then
+                do i = 1, samples
+                    call fi(xk,i,n,t,y,samples,faux(i))
+                end do
+
+                indices(:) = (/(i, i = 1, samples)/)
             
-            if (terminate .le. epsilon) exit
+                ! Sorting
+                call DSORT(faux,indices,samples,kflag)
+
+                do i = 1, samples
+                    print*, faux(i), indices(i)
+                enddo
+            
+                ! q-Order-Value function 
+                fxk = faux(q)
+
+                print*, "La ovo es: ", fxk, q
+                
+                exit
+            endif
             if (iter .ge. max_iter) exit
     
             call mount_Idelta(faux,delta,indices,samples,Idelta,m)
