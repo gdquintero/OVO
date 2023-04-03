@@ -38,10 +38,14 @@ sero_rubella = np.array([
 
 samples = len(age)
 
+age_midpoint = np.empty(samples)
+age_midpoint[:-1] = (age[:-1] + age[1:]) / 2
+age_midpoint[-1]  = 70
+
 with open("output/seropositives.txt","w") as f:
     f.write("%i\n" % samples)
     for i in range(samples):
-        f.write("%i %f %f %f\n" % (age[i],sero_measles[i],sero_mumps[i],sero_rubella[i]))
+        f.write("%i %f %f %f %f\n" % (age[i],sero_measles[i],sero_mumps[i],sero_rubella[i],age_midpoint[i]))
 
 
 # Solucion exacta (del paper farrington)
@@ -49,6 +53,6 @@ sol_measles = np.array([0.197,0.287,0.021])
 sol_mumps   = np.array([0.156,0.250,0.0])
 sol_rubella = np.array([0.0628,0.178,0.020])
 
-plot_seropositive("measles",age,sero_measles)
+# plot_seropositive("measles",age,sero_measles)
 # plot_seropositive("mumps",age,sero_mumps)
 # plot_seropositive("rubella",age,sero_rubella)

@@ -32,10 +32,10 @@ Program main
     read(100,*) samples
 
     n = 4
-    noutliers = 0
+    noutliers = 10
     q = samples - noutliers
 
-    allocate(t(samples),y(samples),x(n),xk(n-1),xtrial(n-1),l(n),u(n),xstar(n-1),data(4,samples),&
+    allocate(t(samples),y(samples),x(n),xk(n-1),xtrial(n-1),l(n),u(n),xstar(n-1),data(5,samples),&
     faux(samples),indices(samples),Idelta(samples),nu_l(n-1),nu_u(n-1),opt_cond(n-1),&
     outliers(3*noutliers),stat=allocerr)
 
@@ -52,6 +52,7 @@ Program main
 
     ! Number of days
     t(:) = data(1,:)
+    ! t(:) = data(5,:)
 
     ! Coded subroutines
     coded(1:6)  = .true.  ! evalf, evalg, evalh, evalc, evaljac, evalhc
@@ -92,31 +93,34 @@ Program main
     y(:) = data(2,:)
     delta = 1.0d-4
     sigmin = 1.0d-2
+    xk(:) = (/9.109573d0, 19.345421d0, 0.202798d0/)
     call ovo_algorithm(q,noutliers,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
     ! print*,"Solution measles: ",xk
     print*,"-------------------------------------------------------------------"
     solutions(1,:) = xk(:)
 
     ! Mumps
-    ! print*
-    ! Print*, "OVO Algorithm for Mumps"
-    ! print*,"-------------------------------------------------------------------"
-    ! q = samples - 5
-    ! y(:) = data(3,:)
-    ! call ovo_algorithm(q,noutliers,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial,outliers(noutliers+1:2*noutliers))
-    ! ! print*,"Solution mumps: ",xk
-    ! print*,"-------------------------------------------------------------------"
-    ! solutions(2,:) = xk(:)
+    print*
+    Print*, "OVO Algorithm for Mumps"
+    print*,"-------------------------------------------------------------------"
+    q = samples - 5
+    y(:) = data(3,:)
+    xk(:) = (/0.201774d0, 0.289024d0, 0.000000d0/)
+    call ovo_algorithm(q,noutliers,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial,outliers(noutliers+1:2*noutliers))
+    ! print*,"Solution mumps: ",xk
+    print*,"-------------------------------------------------------------------"
+    solutions(2,:) = xk(:)
 
-    ! ! Rubella
-    ! print*
-    ! Print*, "OVO Algorithm for Rubella"
-    ! print*,"-------------------------------------------------------------------"
-    ! q = samples - 5
-    ! y(:) = data(4,:)
-    ! call ovo_algorithm(q,noutliers,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial,outliers(2*noutliers+1:3*noutliers))
-    ! ! print*,"Solution rubella: ",xk
-    ! print*,"-------------------------------------------------------------------"
+    ! Rubella
+    print*
+    Print*, "OVO Algorithm for Rubella"
+    print*,"-------------------------------------------------------------------"
+    q = samples - 5
+    y(:) = data(4,:)
+    xk(:) = (/0.000108d0, 2.972498d0, 0.115333d0/)
+    call ovo_algorithm(q,noutliers,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial,outliers(2*noutliers+1:3*noutliers))
+    ! print*,"Solution rubella: ",xk
+    print*,"-------------------------------------------------------------------"
     solutions(3,:) = xk(:)
 
     call export(solutions,outliers,noutliers)
@@ -143,7 +147,6 @@ Program main
         epsilon = 1.0d-4
         iter    = 0
         ! xk(:)   = 0.1d0
-        xk(:) = (/9.109573d0, 19.345421d0, 0.202798d0/)
         indices(:) = (/(i, i = 1, samples)/)
     
         ! Scenarios
@@ -265,11 +268,8 @@ Program main
             20 format (3X,I3,10X,I3,7X,ES14.6,4X,ES14.6,6X,I2)
 
             deallocate(lambda,equatn,linear,grad)
-
             fxk = fxtrial
             xk(1:n-1) = xtrial(1:n-1)
-
-
 
             if (terminate .le. epsilon) then
                 do i = 1, samples
@@ -281,14 +281,14 @@ Program main
                 ! Sorting
                 call DSORT(faux,indices,samples,kflag)
 
-                do i = 1, samples
-                    print*, faux(i), indices(i)
-                enddo
+                ! do i = 1, samples
+                !     print*, faux(i), indices(i)
+                ! enddo
             
                 ! q-Order-Value function 
                 fxk = faux(q)
 
-                print*, "La ovo es: ", fxk, q
+                ! print*, "La ovo es: ", fxk, q
                 
                 exit
             endif
@@ -341,7 +341,7 @@ Program main
         write(100,110) xsol(2,1), xsol(2,2), xsol(2,3)
         write(100,110) xsol(3,1), xsol(3,2), xsol(3,3)
 
-        110 format (F8.6,1X,F8.6,1X,F8.6)
+        110 format (ES12.6,1X,ES12.6,1X,ES12.6)
     
         close(100)
 
