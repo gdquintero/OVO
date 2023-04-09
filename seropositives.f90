@@ -7,7 +7,7 @@ Program main
     real(kind=8) :: fxk,fxtrial,ti,sigma
     real(kind=8), allocatable :: xtrial(:),faux(:),indices(:),nu_l(:),nu_u(:),opt_cond(:),&
                                  xstar(:),y(:),data(:,:),t(:)
-    integer, allocatable :: Idelta(:)
+    integer, allocatable :: Idelta(:),outliers(:)
 
     ! LOCAL SCALARS
     logical :: checkder
@@ -32,11 +32,10 @@ Program main
     read(100,*) samples
 
     n = 4
-    ! noutliers = 10
-    ! q = samples - noutliers
 
     allocate(t(samples),y(samples),x(n),xk(n-1),xtrial(n-1),l(n),u(n),xstar(n-1),data(5,samples),&
-    faux(samples),indices(samples),Idelta(samples),nu_l(n-1),nu_u(n-1),opt_cond(n-1),stat=allocerr)
+    faux(samples),indices(samples),Idelta(samples),nu_l(n-1),nu_u(n-1),opt_cond(n-1),&
+    outliers(3*samples),stat=allocerr)
 
     if ( allocerr .ne. 0 ) then
         write(*,*) 'Allocation error in main program'
@@ -83,27 +82,38 @@ Program main
     l(1:n-1) = 0.0d0; l(n) = -1.0d+20
     u(1:n-1) = 1.0d+20; u(n) = 0.0d0
 
-    call single_test(10,t,y,indices,Idelta,samples,m,n,xtrial)
+    call single_test(5,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
+
+    ! call mixed_test(1,10,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
 
     CONTAINS
 
-    subroutine single_test(noutliers,t,y,indices,Idelta,samples,m,n,xtrial)
+    subroutine mixed_test(q_inf,q_sup,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
+        implicit none
+
+        integer,        intent(in) :: samples,n,q_inf,q_sup
+        real(kind=8),   intent(in) :: t(samples)
+        integer,        intent(inout) :: Idelta(samples),outliers(3*samples),m
+        real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),y(samples)
+
+        integer :: noutliers,q
+
+        do q = q_inf,q_sup
+            xk(:) = (/9.109573d0, 19.345421d0, 0.202798d0/)
+            call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
+        enddo
+        
+    end subroutine mixed_test
+
+    subroutine single_test(noutliers,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
         implicit none
 
         integer,        intent(in) :: samples,n,noutliers
         real(kind=8),   intent(in) :: t(samples)
-        integer,        intent(inout) :: Idelta(samples),m
+        integer,        intent(inout) :: Idelta(samples),outliers(3*samples),m
         real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),y(samples)
 
         integer :: q
-        integer, allocatable :: outliers(:)
-
-        allocate(outliers(3*noutliers),stat=allocerr)
-    
-        if ( allocerr .ne. 0 ) then
-            write(*,*) 'Allocation error in single_test subroutine'
-            stop
-        end if
 
         solutions(:,:) = 0.0d0
         q = samples - noutliers
@@ -119,30 +129,30 @@ Program main
         print*,"-------------------------------------------------------------------"
         solutions(1,:) = xk(:)
     
-        ! Mumps
-        print*
-        Print*, "OVO Algorithm for Mumps"
-        print*,"-------------------------------------------------------------------"
-        y(:) = data(3,:)
-        xk(:) = (/0.201774d0, 0.289024d0, 0.000000d0/)
-        call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(noutliers+1:2*noutliers))
-        ! print*,"Solution mumps: ",xk
-        print*,"-------------------------------------------------------------------"
-        solutions(2,:) = xk(:)
+        ! ! Mumps
+        ! print*
+        ! Print*, "OVO Algorithm for Mumps"
+        ! print*,"-------------------------------------------------------------------"
+        ! y(:) = data(3,:)
+        ! xk(:) = (/0.201774d0, 0.289024d0, 0.000000d0/)
+        ! call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(noutliers+1:2*noutliers))
+        ! ! print*,"Solution mumps: ",xk
+        ! print*,"-------------------------------------------------------------------"
+        ! solutions(2,:) = xk(:)
     
-        ! Rubella
-        print*
-        Print*, "OVO Algorithm for Rubella"
-        print*,"-------------------------------------------------------------------"
-        y(:) = data(4,:)
-        xk(:) = (/0.000108d0, 2.972498d0, 0.115333d0/)
-        call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(2*noutliers+1:3*noutliers))
-        ! print*,"Solution rubella: ",xk
-        print*,"-------------------------------------------------------------------"
-        solutions(3,:) = xk(:)
+        ! ! Rubella
+        ! print*
+        ! Print*, "OVO Algorithm for Rubella"
+        ! print*,"-------------------------------------------------------------------"
+        ! y(:) = data(4,:)
+        ! xk(:) = (/0.000108d0, 2.972498d0, 0.115333d0/)
+        ! call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(2*noutliers+1:3*noutliers))
+        ! ! print*,"Solution rubella: ",xk
+        ! print*,"-------------------------------------------------------------------"
+        ! solutions(3,:) = xk(:)
 
         call export(solutions,outliers,noutliers)
-        deallocate(outliers)
+
     end subroutine single_test
 
     !==============================================================================
@@ -163,10 +173,10 @@ Program main
 
         alpha   = 0.5d0
         epsilon = 1.0d-4
-        delta = 1.0d-4
-        sigmin = 1.0d-2
+        delta   = 1.0d-4
+        sigmin  = 1.0d-2
         iter    = 0
-        ! xk(:)   = 0.1d0
+        xk(:)   = 0.1d0
         indices(:) = (/(i, i = 1, samples)/)
     
         ! Scenarios
@@ -284,7 +294,7 @@ Program main
             terminate = norm2(opt_cond)
 
             write(*,20)  iter,iter_sub,fxtrial,terminate,m
-            20 format (3X,I4,10X,I4,7X,ES14.6,4X,ES14.6,6X,I2)
+            20 format (2X,I4,10X,I4,6X,ES14.6,4X,ES14.6,6X,I2)
 
             deallocate(lambda,equatn,linear,grad)
             fxk = fxtrial
@@ -349,7 +359,7 @@ Program main
     subroutine export(xsol,outliers,noutliers)
         implicit none
 
-        integer,        intent(in) :: noutliers,outliers(3*noutliers)
+        integer,        intent(in) :: noutliers,outliers(3*samples)
         real(kind=8),   intent(in) :: xsol(n-1,n-1)
 
         integer :: i
