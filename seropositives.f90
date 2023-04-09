@@ -3,11 +3,11 @@ Program main
 
     implicit none 
     
-    integer :: allocerr,samples,q,noutliers
-    real(kind=8) :: delta,sigmin,fxk,fxtrial,ti,sigma
+    integer :: allocerr,samples
+    real(kind=8) :: fxk,fxtrial,ti,sigma
     real(kind=8), allocatable :: xtrial(:),faux(:),indices(:),nu_l(:),nu_u(:),opt_cond(:),&
                                  xstar(:),y(:),data(:,:),t(:)
-    integer, allocatable :: Idelta(:),outliers(:)
+    integer, allocatable :: Idelta(:)
 
     ! LOCAL SCALARS
     logical :: checkder
@@ -32,12 +32,11 @@ Program main
     read(100,*) samples
 
     n = 4
-    noutliers = 10
-    q = samples - noutliers
+    ! noutliers = 10
+    ! q = samples - noutliers
 
     allocate(t(samples),y(samples),x(n),xk(n-1),xtrial(n-1),l(n),u(n),xstar(n-1),data(5,samples),&
-    faux(samples),indices(samples),Idelta(samples),nu_l(n-1),nu_u(n-1),opt_cond(n-1),&
-    outliers(3*noutliers),stat=allocerr)
+    faux(samples),indices(samples),Idelta(samples),nu_l(n-1),nu_u(n-1),opt_cond(n-1),stat=allocerr)
 
     if ( allocerr .ne. 0 ) then
         write(*,*) 'Allocation error in main program'
@@ -84,67 +83,88 @@ Program main
     l(1:n-1) = 0.0d0; l(n) = -1.0d+20
     u(1:n-1) = 1.0d+20; u(n) = 0.0d0
 
-    solutions(:,:) = 0.0d0
-
-    ! Measles
-    print*
-    Print*, "OVO Algorithm for Measles"
-    print*,"-------------------------------------------------------------------"
-    y(:) = data(2,:)
-    delta = 1.0d-4
-    sigmin = 1.0d-2
-    xk(:) = (/9.109573d0, 19.345421d0, 0.202798d0/)
-    call ovo_algorithm(q,noutliers,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
-    ! print*,"Solution measles: ",xk
-    print*,"-------------------------------------------------------------------"
-    solutions(1,:) = xk(:)
-
-    ! Mumps
-    print*
-    Print*, "OVO Algorithm for Mumps"
-    print*,"-------------------------------------------------------------------"
-    q = samples - 5
-    y(:) = data(3,:)
-    xk(:) = (/0.201774d0, 0.289024d0, 0.000000d0/)
-    call ovo_algorithm(q,noutliers,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial,outliers(noutliers+1:2*noutliers))
-    ! print*,"Solution mumps: ",xk
-    print*,"-------------------------------------------------------------------"
-    solutions(2,:) = xk(:)
-
-    ! Rubella
-    print*
-    Print*, "OVO Algorithm for Rubella"
-    print*,"-------------------------------------------------------------------"
-    q = samples - 5
-    y(:) = data(4,:)
-    xk(:) = (/0.000108d0, 2.972498d0, 0.115333d0/)
-    call ovo_algorithm(q,noutliers,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial,outliers(2*noutliers+1:3*noutliers))
-    ! print*,"Solution rubella: ",xk
-    print*,"-------------------------------------------------------------------"
-    solutions(3,:) = xk(:)
-
-    call export(solutions,outliers,noutliers)
+    call single_test(10,t,y,indices,Idelta,samples,m,n,xtrial)
 
     CONTAINS
+
+    subroutine single_test(noutliers,t,y,indices,Idelta,samples,m,n,xtrial)
+        implicit none
+
+        integer,        intent(in) :: samples,n,noutliers
+        real(kind=8),   intent(in) :: t(samples)
+        integer,        intent(inout) :: Idelta(samples),m
+        real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),y(samples)
+
+        integer :: q
+        integer, allocatable :: outliers(:)
+
+        allocate(outliers(3*noutliers),stat=allocerr)
+    
+        if ( allocerr .ne. 0 ) then
+            write(*,*) 'Allocation error in single_test subroutine'
+            stop
+        end if
+
+        solutions(:,:) = 0.0d0
+        q = samples - noutliers
+
+        ! Measles
+        print*
+        Print*, "OVO Algorithm for Measles"
+        print*,"-------------------------------------------------------------------"
+        y(:) = data(2,:)
+        xk(:) = (/9.109573d0, 19.345421d0, 0.202798d0/)
+        call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
+        ! print*,"Solution measles: ",xk
+        print*,"-------------------------------------------------------------------"
+        solutions(1,:) = xk(:)
+    
+        ! Mumps
+        print*
+        Print*, "OVO Algorithm for Mumps"
+        print*,"-------------------------------------------------------------------"
+        y(:) = data(3,:)
+        xk(:) = (/0.201774d0, 0.289024d0, 0.000000d0/)
+        call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(noutliers+1:2*noutliers))
+        ! print*,"Solution mumps: ",xk
+        print*,"-------------------------------------------------------------------"
+        solutions(2,:) = xk(:)
+    
+        ! Rubella
+        print*
+        Print*, "OVO Algorithm for Rubella"
+        print*,"-------------------------------------------------------------------"
+        y(:) = data(4,:)
+        xk(:) = (/0.000108d0, 2.972498d0, 0.115333d0/)
+        call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(2*noutliers+1:3*noutliers))
+        ! print*,"Solution rubella: ",xk
+        print*,"-------------------------------------------------------------------"
+        solutions(3,:) = xk(:)
+
+        call export(solutions,outliers,noutliers)
+        deallocate(outliers)
+    end subroutine single_test
 
     !==============================================================================
     ! MAIN ALGORITHM
     !==============================================================================
-    subroutine ovo_algorithm(q,noutliers,delta,sigmin,t,y,indices,Idelta,samples,m,n,xtrial,outliers)
+    subroutine ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers)
         implicit none
 
         integer,        intent(in) :: q,noutliers,samples,n
-        real(kind=8),   intent(in) :: delta,sigmin,t(samples),y(samples)
+        real(kind=8),   intent(in) :: t(samples),y(samples)
         integer,        intent(inout) :: Idelta(samples),m
         real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1)
         integer,        intent(inout) :: outliers(noutliers)
 
         integer, parameter  :: max_iter = 100000, max_iter_sub = 1000, kflag = 2
         integer             :: iter,iter_sub,i,j
-        real(kind=8)        :: gaux1,gaux2,a,b,c,ebt,terminate,alpha,epsilon
+        real(kind=8)        :: gaux1,gaux2,a,b,c,ebt,terminate,alpha,epsilon,delta,sigmin
 
         alpha   = 0.5d0
         epsilon = 1.0d-4
+        delta = 1.0d-4
+        sigmin = 1.0d-2
         iter    = 0
         ! xk(:)   = 0.1d0
         indices(:) = (/(i, i = 1, samples)/)
@@ -156,11 +176,10 @@ Program main
     
         ! Sorting
         call DSORT(faux,indices,samples,kflag)
-    
         ! q-Order-Value function 
         fxk = faux(q)
-    
-        call mount_Idelta(faux,delta,indices,samples,Idelta,m)
+
+        call mount_Idelta(faux,delta,q,indices,samples,Idelta,m)
 
         write(*,10) "Iterations","Inter. Iter.","Objective func.","Optimality cond.","Idelta"
         10 format (A11,2X,A12,2X,A15,2X,A16,2X,A6)
@@ -265,7 +284,7 @@ Program main
             terminate = norm2(opt_cond)
 
             write(*,20)  iter,iter_sub,fxtrial,terminate,m
-            20 format (3X,I3,10X,I3,7X,ES14.6,4X,ES14.6,6X,I2)
+            20 format (3X,I4,10X,I4,7X,ES14.6,4X,ES14.6,6X,I2)
 
             deallocate(lambda,equatn,linear,grad)
             fxk = fxtrial
@@ -294,13 +313,13 @@ Program main
             endif
             if (iter .ge. max_iter) exit
     
-            call mount_Idelta(faux,delta,indices,samples,Idelta,m)
+            call mount_Idelta(faux,delta,q,indices,samples,Idelta,m)
             
         end do ! End of Main Algorithm
 
         outliers(:) = int(indices(samples - noutliers + 1:))
         
-    end subroutine
+    end subroutine ovo_algorithm
 
     ! !==============================================================================
     ! ! 
@@ -362,10 +381,10 @@ Program main
     !==============================================================================
     ! MOUNT THE SET OF INDICES I(x,delta)
     !==============================================================================
-    subroutine mount_Idelta(f,delta,indices,samples,Idelta,m)
+    subroutine mount_Idelta(f,delta,q,indices,samples,Idelta,m)
         implicit none
 
-        integer,        intent(in) :: samples
+        integer,        intent(in) :: samples,q
         real(kind=8),   intent(in) :: delta,f(samples),indices(samples)
         integer,        intent(out) :: Idelta(samples),m
         integer :: i
