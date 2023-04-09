@@ -82,23 +82,31 @@ Program main
     l(1:n-1) = 0.0d0; l(n) = -1.0d+20
     u(1:n-1) = 1.0d+20; u(n) = 0.0d0
 
-    call single_test(5,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
+    ! call single_test(5,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
 
-    ! call mixed_test(1,10,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
+    call mixed_test(1,10,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
 
     CONTAINS
 
-    subroutine mixed_test(q_inf,q_sup,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
+    subroutine mixed_test(out_inf,out_sup,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
         implicit none
 
-        integer,        intent(in) :: samples,n,q_inf,q_sup
+        integer,        intent(in) :: samples,n,out_inf,out_sup
         real(kind=8),   intent(in) :: t(samples)
         integer,        intent(inout) :: Idelta(samples),outliers(3*samples),m
         real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),y(samples)
 
         integer :: noutliers,q
 
-        do q = q_inf,q_sup
+        print*
+        Print*, "OVO Algorithm for Measles"
+        y(:) = data(2,:)
+
+        do noutliers = out_inf,out_sup
+            q = samples - noutliers
+            print*
+            write(*,10) "Number of outliers: ",noutliers
+            10 format (1X,A20,I2)
             xk(:) = (/9.109573d0, 19.345421d0, 0.202798d0/)
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
         enddo
@@ -121,35 +129,29 @@ Program main
         ! Measles
         print*
         Print*, "OVO Algorithm for Measles"
-        print*,"-------------------------------------------------------------------"
         y(:) = data(2,:)
         xk(:) = (/9.109573d0, 19.345421d0, 0.202798d0/)
         call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
         ! print*,"Solution measles: ",xk
-        print*,"-------------------------------------------------------------------"
         solutions(1,:) = xk(:)
     
-        ! ! Mumps
-        ! print*
-        ! Print*, "OVO Algorithm for Mumps"
-        ! print*,"-------------------------------------------------------------------"
-        ! y(:) = data(3,:)
-        ! xk(:) = (/0.201774d0, 0.289024d0, 0.000000d0/)
-        ! call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(noutliers+1:2*noutliers))
-        ! ! print*,"Solution mumps: ",xk
-        ! print*,"-------------------------------------------------------------------"
-        ! solutions(2,:) = xk(:)
+        ! Mumps
+        print*
+        Print*, "OVO Algorithm for Mumps"
+        y(:) = data(3,:)
+        xk(:) = (/0.201774d0, 0.289024d0, 0.000000d0/)
+        call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(noutliers+1:2*noutliers))
+        ! print*,"Solution mumps: ",xk
+        solutions(2,:) = xk(:)
     
-        ! ! Rubella
-        ! print*
-        ! Print*, "OVO Algorithm for Rubella"
-        ! print*,"-------------------------------------------------------------------"
-        ! y(:) = data(4,:)
-        ! xk(:) = (/0.000108d0, 2.972498d0, 0.115333d0/)
-        ! call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(2*noutliers+1:3*noutliers))
-        ! ! print*,"Solution rubella: ",xk
-        ! print*,"-------------------------------------------------------------------"
-        ! solutions(3,:) = xk(:)
+        ! Rubella
+        print*
+        Print*, "OVO Algorithm for Rubella"
+        y(:) = data(4,:)
+        xk(:) = (/0.000108d0, 2.972498d0, 0.115333d0/)
+        call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(2*noutliers+1:3*noutliers))
+        ! print*,"Solution rubella: ",xk
+        solutions(3,:) = xk(:)
 
         call export(solutions,outliers,noutliers)
 
@@ -191,9 +193,13 @@ Program main
 
         call mount_Idelta(faux,delta,q,indices,samples,Idelta,m)
 
+        print*,"-------------------------------------------------------------------"
         write(*,10) "Iterations","Inter. Iter.","Objective func.","Optimality cond.","Idelta"
         10 format (A11,2X,A12,2X,A15,2X,A16,2X,A6)
         print*,"-------------------------------------------------------------------"
+
+        write(*,20)  0,"-",fxk,"-",m
+        20 format (5X,I1,13X,A1,6X,ES14.6,12X,A1,11X,I2)
 
         do
             iter = iter + 1
@@ -293,39 +299,20 @@ Program main
             opt_cond(:) = opt_cond(:) + nu_u(:) - nu_l(:)
             terminate = norm2(opt_cond)
 
-            write(*,20)  iter,iter_sub,fxtrial,terminate,m
-            20 format (2X,I4,10X,I4,6X,ES14.6,4X,ES14.6,6X,I2)
+            write(*,30)  iter,iter_sub,fxtrial,terminate,m
+            30 format (2X,I4,10X,I4,6X,ES14.6,4X,ES14.6,6X,I2)
 
             deallocate(lambda,equatn,linear,grad)
             fxk = fxtrial
             xk(1:n-1) = xtrial(1:n-1)
 
-            if (terminate .le. epsilon) then
-                do i = 1, samples
-                    call fi(xk,i,n,t,y,samples,faux(i))
-                end do
-
-                indices(:) = (/(i, i = 1, samples)/)
-            
-                ! Sorting
-                call DSORT(faux,indices,samples,kflag)
-
-                ! do i = 1, samples
-                !     print*, faux(i), indices(i)
-                ! enddo
-            
-                ! q-Order-Value function 
-                fxk = faux(q)
-
-                ! print*, "La ovo es: ", fxk, q
-                
-                exit
-            endif
+            if (terminate .le. epsilon) exit
             if (iter .ge. max_iter) exit
     
             call mount_Idelta(faux,delta,q,indices,samples,Idelta,m)
             
         end do ! End of Main Algorithm
+        print*,"-------------------------------------------------------------------"
 
         outliers(:) = int(indices(samples - noutliers + 1:))
         
