@@ -84,7 +84,7 @@ Program main
 
     ! call single_test(5,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
 
-    call mixed_test(1,10,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
+    call mixed_test(1,5,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
 
     CONTAINS
 
@@ -105,11 +105,60 @@ Program main
         do noutliers = out_inf,out_sup
             q = samples - noutliers
             print*
-            write(*,10) "Number of outliers: ",noutliers
-            10 format (1X,A20,I2)
+            write(*,1100) "Number of outliers: ",noutliers
             xk(:) = (/9.109573d0, 19.345421d0, 0.202798d0/)
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
+
+            Open(Unit = 100, File = "output/solutions_mixed_measles.txt", ACCESS = "SEQUENTIAL")
+
+            write(100,1000) xtrial(1), xtrial(2), xtrial(3)
         enddo
+
+        print*
+        Print*, "OVO Algorithm for Mumps"
+        y(:) = data(3,:)
+
+        do noutliers = out_inf,out_sup
+            q = samples - noutliers
+            print*
+            write(*,1100) "Number of outliers: ",noutliers
+            xk(:) = (/0.201774d0, 0.289024d0, 0.000000d0/)
+            call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
+
+            Open(Unit = 110, File = "output/solutions_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
+
+            write(110,1000) xtrial(1), xtrial(2), xtrial(3)
+        enddo
+
+        print*
+        Print*, "OVO Algorithm for Rubella"
+        y(:) = data(4,:)
+
+        do noutliers = out_inf,out_sup
+            q = samples - noutliers
+            print*
+            write(*,1100) "Number of outliers: ",noutliers
+            xk(:) = (/0.000108d0, 2.972498d0, 0.115333d0/)
+            call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
+
+            Open(Unit = 120, File = "output/solutions_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
+
+            write(120,1000) xtrial(1), xtrial(2), xtrial(3)
+    
+        enddo
+
+        Open(Unit = 200, File = "output/num_mixed_test.txt", ACCESS = "SEQUENTIAL")
+        write(200,1200) out_inf
+        write(200,1200) out_sup
+        
+        1000 format (ES12.6,1X,ES12.6,1X,ES12.6)
+        1100 format (1X,A20,I2)
+        1200 format (I2)
+
+        close(100)
+        close(110)
+        close(120)
+        close(200)
         
     end subroutine mixed_test
 
@@ -318,27 +367,23 @@ Program main
         
     end subroutine ovo_algorithm
 
-    ! !==============================================================================
-    ! ! 
-    ! !==============================================================================
-    ! subroutine quadatic_error(x,n,res)
-    !     implicit none 
+    !==============================================================================
+    ! 
+    !==============================================================================
+    subroutine quadatic_error(x,n,res)
+        implicit none 
 
-    !     integer,        intent(in) :: n
-    !     real(kind=8),   intent(in) :: x(n-1)
-    !     real(kind=8),   intent(out) :: res
-    !     integer :: i
-    !     real(kind=8) :: aux
+        integer,        intent(in) :: n
+        real(kind=8),   intent(in) :: x(n-1)
+        real(kind=8),   intent(out) :: res
+        integer :: i
+        real(kind=8) :: aux
 
-    !     res = 0.0d090
+        res = 0.0d0
 
-    !     do i = 1, samples
-    !         call model(x,i,n,aux)
-    !         aux = aux - y(i)
-    !         res = res + aux**2
-    !     enddo
 
-    ! end subroutine quadatic_error
+
+    end subroutine quadatic_error
 
     !==============================================================================
     ! EXPORT RESULT TO PLOT
