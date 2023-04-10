@@ -84,7 +84,7 @@ Program main
 
     ! call single_test(5,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
 
-    call mixed_test(1,5,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
+    call mixed_test(1,1,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
 
     CONTAINS
 
@@ -110,42 +110,45 @@ Program main
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
 
             Open(Unit = 100, File = "output/solutions_mixed_measles.txt", ACCESS = "SEQUENTIAL")
+            Open(Unit = 300, File = "output/error_mixed_measles.txt", ACCESS = "SEQUENTIAL")
 
             write(100,1000) xtrial(1), xtrial(2), xtrial(3)
+
+            print*,outliers
         enddo
 
-        print*
-        Print*, "OVO Algorithm for Mumps"
-        y(:) = data(3,:)
+        ! print*
+        ! Print*, "OVO Algorithm for Mumps"
+        ! y(:) = data(3,:)
 
-        do noutliers = out_inf,out_sup
-            q = samples - noutliers
-            print*
-            write(*,1100) "Number of outliers: ",noutliers
-            xk(:) = (/0.201774d0, 0.289024d0, 0.000000d0/)
-            call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
+        ! do noutliers = out_inf,out_sup
+        !     q = samples - noutliers
+        !     print*
+        !     write(*,1100) "Number of outliers: ",noutliers
+        !     xk(:) = (/0.201774d0, 0.289024d0, 0.000000d0/)
+        !     call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
 
-            Open(Unit = 110, File = "output/solutions_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
+        !     Open(Unit = 110, File = "output/solutions_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
 
-            write(110,1000) xtrial(1), xtrial(2), xtrial(3)
-        enddo
+        !     write(110,1000) xtrial(1), xtrial(2), xtrial(3)
+        ! enddo
 
-        print*
-        Print*, "OVO Algorithm for Rubella"
-        y(:) = data(4,:)
+        ! print*
+        ! Print*, "OVO Algorithm for Rubella"
+        ! y(:) = data(4,:)
 
-        do noutliers = out_inf,out_sup
-            q = samples - noutliers
-            print*
-            write(*,1100) "Number of outliers: ",noutliers
-            xk(:) = (/0.000108d0, 2.972498d0, 0.115333d0/)
-            call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
+        ! do noutliers = out_inf,out_sup
+        !     q = samples - noutliers
+        !     print*
+        !     write(*,1100) "Number of outliers: ",noutliers
+        !     xk(:) = (/0.000108d0, 2.972498d0, 0.115333d0/)
+        !     call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
 
-            Open(Unit = 120, File = "output/solutions_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
+        !     Open(Unit = 120, File = "output/solutions_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
 
-            write(120,1000) xtrial(1), xtrial(2), xtrial(3)
+        !     write(120,1000) xtrial(1), xtrial(2), xtrial(3)
     
-        enddo
+        ! enddo
 
         Open(Unit = 200, File = "output/num_mixed_test.txt", ACCESS = "SEQUENTIAL")
         write(200,1200) out_inf
@@ -370,18 +373,21 @@ Program main
     !==============================================================================
     ! 
     !==============================================================================
-    subroutine quadatic_error(x,n,res)
+    subroutine quadatic_error(x,n,outliers,noutliers,t,y,res)
         implicit none 
 
-        integer,        intent(in) :: n
-        real(kind=8),   intent(in) :: x(n-1)
+        integer,        intent(in) :: n,noutliers
+        real(kind=8),   intent(in) :: t(samples),y(samples),x(n-1),outliers(noutliers)
         real(kind=8),   intent(out) :: res
+
         integer :: i
         real(kind=8) :: aux
 
         res = 0.0d0
 
-
+        do i = 1,samples
+            if (i .ne. )
+        enddo
 
     end subroutine quadatic_error
 
