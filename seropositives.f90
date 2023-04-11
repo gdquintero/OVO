@@ -6,7 +6,7 @@ Program main
     integer :: allocerr,samples
     real(kind=8) :: fxk,fxtrial,ti,sigma
     real(kind=8), allocatable :: xtrial(:),faux(:),indices(:),nu_l(:),nu_u(:),opt_cond(:),&
-                                 xstar(:),y(:),data(:,:),t(:)
+                                 xstar(:),y(:),data(:,:),t(:),error(:)
     integer, allocatable :: Idelta(:),outliers(:)
 
     ! LOCAL SCALARS
@@ -35,7 +35,7 @@ Program main
 
     allocate(t(samples),y(samples),x(n),xk(n-1),xtrial(n-1),l(n),u(n),xstar(n-1),data(5,samples),&
     faux(samples),indices(samples),Idelta(samples),nu_l(n-1),nu_u(n-1),opt_cond(n-1),&
-    outliers(3*samples),stat=allocerr)
+    outliers(3*samples),error(samples),stat=allocerr)
 
     if ( allocerr .ne. 0 ) then
         write(*,*) 'Allocation error in main program'
@@ -84,23 +84,25 @@ Program main
 
     ! call single_test(5,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
 
-    call mixed_test(1,1,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
+    call mixed_test(1,10,outliers,t,y,indices,Idelta,samples,m,n,xtrial,error)
 
     CONTAINS
 
-    subroutine mixed_test(out_inf,out_sup,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
+    subroutine mixed_test(out_inf,out_sup,outliers,t,y,indices,Idelta,samples,m,n,xtrial,error)
         implicit none
 
         integer,        intent(in) :: samples,n,out_inf,out_sup
         real(kind=8),   intent(in) :: t(samples)
         integer,        intent(inout) :: Idelta(samples),outliers(3*samples),m
         real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),y(samples)
+        real(kind=8),   intent(out) :: error(samples)
 
-        integer :: noutliers,q
+        integer :: noutliers,q,k
 
         print*
         Print*, "OVO Algorithm for Measles"
         y(:) = data(2,:)
+        k = 1
 
         do noutliers = out_inf,out_sup
             q = samples - noutliers
@@ -114,8 +116,12 @@ Program main
 
             write(100,1000) xtrial(1), xtrial(2), xtrial(3)
 
-            print*,outliers
+            call quadatic_error(xtrial,n,samples,outliers,noutliers,t,y,error(k))
+            k = k + 1
+            
         enddo
+
+        print*, error
 
         ! print*
         ! Print*, "OVO Algorithm for Mumps"
@@ -373,11 +379,11 @@ Program main
     !==============================================================================
     ! 
     !==============================================================================
-    subroutine quadatic_error(x,n,outliers,noutliers,t,y,res)
+    subroutine quadatic_error(x,n,samples,outliers,noutliers,t,y,res)
         implicit none 
 
-        integer,        intent(in) :: n,noutliers
-        real(kind=8),   intent(in) :: t(samples),y(samples),x(n-1),outliers(noutliers)
+        integer,        intent(in) :: n,noutliers,samples,outliers(noutliers)
+        real(kind=8),   intent(in) :: t(samples),y(samples),x(n-1)
         real(kind=8),   intent(out) :: res
 
         integer :: i
@@ -386,7 +392,11 @@ Program main
         res = 0.0d0
 
         do i = 1,samples
-            if (i .ne. )
+            if (ANY(outliers .ne. i)) then
+                call model(x,i,n,t,samples,aux)
+                aux = aux - y(i)
+                res = res + aux**2
+            endif
         enddo
 
     end subroutine quadatic_error

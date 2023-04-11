@@ -1,4 +1,4 @@
-export ALGENCAN=/home/gustavo/algencan-3.1.1
+export ALGENCAN=~/algencan-3.1.1
 
 rm -f seropositives
 
