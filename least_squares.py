@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
+from sklearn.metrics import mean_squared_error
 import models
 
 df = pd.read_table("output/seropositives.txt",delimiter=" ",header=None,skiprows=1)
@@ -13,4 +14,9 @@ with open("output/solutions_ls.txt","w") as f:
     f.write("%f %f %f\n" % (popt_measles[0],popt_measles[1],popt_measles[2]))
     f.write("%f %f %f\n" % (popt_mumps[0],popt_mumps[1],popt_mumps[2]))
     f.write("%f %f %f\n" % (popt_rubella[0],popt_rubella[1],popt_rubella[2])) 
+
+y_pred = np.empty((3,29))
+
+y_pred[1,:] = 
     
+print("Mean squared error:")

@@ -408,6 +408,8 @@ Program main
             endif
         enddo
 
+        res = res / samples
+
     end subroutine quadatic_error
 
     !==============================================================================
