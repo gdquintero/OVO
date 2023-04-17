@@ -391,6 +391,8 @@ Program main
         print*,"-------------------------------------------------------------------"
 
         outliers(:) = int(indices(samples - noutliers + 1:))
+        fovo = fxk
+        iterations = iter
         
     end subroutine ovo_algorithm
 
