@@ -105,7 +105,7 @@ Program main
         real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),y(samples)
 
         integer :: noutliers,q
-        real(kind=8) :: error
+        real(kind=8) :: error,fovo,iterations
 
         print*
         Print*, "OVO Algorithm for Measles"
@@ -116,7 +116,7 @@ Program main
             print*
             write(*,1100) "Number of outliers: ",noutliers
             xk(:) = xinit_ls(1,:)
-            call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
+            call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
 
             Open(Unit = 100, File = "output/solutions_mixed_measles.txt", ACCESS = "SEQUENTIAL")
             Open(Unit = 300, File = "output/error_mixed_measles.txt", ACCESS = "SEQUENTIAL")
@@ -137,7 +137,7 @@ Program main
             print*
             write(*,1100) "Number of outliers: ",noutliers
             xk(:) = xinit_ls(2,:)
-            call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
+            call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
 
             Open(Unit = 110, File = "output/solutions_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
             Open(Unit = 400, File = "output/error_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
@@ -157,7 +157,7 @@ Program main
             print*
             write(*,1100) "Number of outliers: ",noutliers
             xk(:) = xinit_ls(3,:)
-            call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
+            call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
 
             Open(Unit = 120, File = "output/solutions_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
             Open(Unit = 500, File = "output/error_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
@@ -196,7 +196,8 @@ Program main
         integer,        intent(inout) :: Idelta(samples),outliers(3*samples),m
         real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),y(samples)
 
-        integer :: q
+        integer :: fovo,iterations
+        real(kind=8) 
 
         solutions(:,:) = 0.0d0
         q = samples - noutliers
@@ -206,7 +207,7 @@ Program main
         Print*, "OVO Algorithm for Measles"
         y(:) = data(2,:)
         xk(:) = xinit_ls(1,:)
-        call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
+        call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
         ! print*,"Solution measles: ",xk
         solutions(1,:) = xk(:)
     
@@ -215,7 +216,7 @@ Program main
         Print*, "OVO Algorithm for Mumps"
         y(:) = data(3,:)
         xk(:) = xinit_ls(2,:)
-        call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(noutliers+1:2*noutliers))
+        call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(noutliers+1:2*noutliers),fovo,iterations)
         ! print*,"Solution mumps: ",xk
         solutions(2,:) = xk(:)
     
@@ -224,7 +225,7 @@ Program main
         Print*, "OVO Algorithm for Rubella"
         y(:) = data(4,:)
         xk(:) = xinit_ls(3,:)
-        call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(2*noutliers+1:3*noutliers))
+        call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(2*noutliers+1:3*noutliers),fovo,iterations)
         ! print*,"Solution rubella: ",xk
         solutions(3,:) = xk(:)
 
@@ -235,11 +236,11 @@ Program main
     !==============================================================================
     ! MAIN ALGORITHM
     !==============================================================================
-    subroutine ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers)
+    subroutine ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers,fovo,iterations)
         implicit none
 
         integer,        intent(in) :: q,noutliers,samples,n
-        real(kind=8),   intent(in) :: t(samples),y(samples)
+        real(kind=8),   intent(in) :: t(samples),y(samples),fovo,iterations
         integer,        intent(inout) :: Idelta(samples),m
         real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1)
         integer,        intent(inout) :: outliers(noutliers)
