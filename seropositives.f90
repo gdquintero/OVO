@@ -196,8 +196,8 @@ Program main
         integer,        intent(inout) :: Idelta(samples),outliers(3*samples),m
         real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),y(samples)
 
-        integer :: fovo,iterations
-        real(kind=8) 
+        integer :: q
+        real(kind=8) :: fovo,iterations
 
         solutions(:,:) = 0.0d0
         q = samples - noutliers
@@ -240,9 +240,9 @@ Program main
         implicit none
 
         integer,        intent(in) :: q,noutliers,samples,n
-        real(kind=8),   intent(in) :: t(samples),y(samples),fovo,iterations
+        real(kind=8),   intent(in) :: t(samples),y(samples)
         integer,        intent(inout) :: Idelta(samples),m
-        real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1)
+        real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),fovo,iterations
         integer,        intent(inout) :: outliers(noutliers)
 
         integer, parameter  :: max_iter = 100000, max_iter_sub = 1000, kflag = 2
