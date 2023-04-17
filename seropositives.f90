@@ -92,7 +92,7 @@ Program main
 
     ! call single_test(2,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
 
-    call mixed_test(1,5,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
+    call mixed_test(1,10,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
 
     CONTAINS
 
@@ -181,7 +181,7 @@ Program main
     
         enddo
 
-        Open(Unit = 200, File = "output/num_mixed_test.txt", ACCESS = "SEQUENTIAL")
+        Open(Unit = 500, File = "output/num_mixed_test.txt", ACCESS = "SEQUENTIAL")
         write(500,1200) out_inf
         write(500,1200) out_sup
         
