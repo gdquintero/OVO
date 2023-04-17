@@ -90,9 +90,9 @@ Program main
 
     close(200)
 
-    call single_test(2,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
+    ! call single_test(2,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
 
-    ! call mixed_test(1,5,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
+    call mixed_test(1,5,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
 
     CONTAINS
 
@@ -104,8 +104,8 @@ Program main
         integer,        intent(inout) :: Idelta(samples),outliers(3*samples),m
         real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),y(samples)
 
-        integer :: noutliers,q
-        real(kind=8) :: error,fovo,iterations
+        integer :: noutliers,q,iterations
+        real(kind=8) :: error,fovo
 
         print*
         Print*, "OVO Algorithm for Measles"
@@ -116,15 +116,19 @@ Program main
             print*
             write(*,1100) "Number of outliers: ",noutliers
             xk(:) = xinit_ls(1,:)
+
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
+            call quadatic_error(xtrial,n,samples,outliers,noutliers,t,y,error)
 
             Open(Unit = 100, File = "output/solutions_mixed_measles.txt", ACCESS = "SEQUENTIAL")
-            Open(Unit = 300, File = "output/error_mixed_measles.txt", ACCESS = "SEQUENTIAL")
+            Open(Unit = 200, File = "output/error_mixed_measles.txt", ACCESS = "SEQUENTIAL")
+            Open(Unit = 300, File = "output/fobj_mixed_measles.txt", ACCESS = "SEQUENTIAL")
+            Open(Unit = 400, File = "output/iterations_mixed_measles.txt", ACCESS = "SEQUENTIAL")
 
             write(100,1000) xtrial(1), xtrial(2), xtrial(3)
-
-            call quadatic_error(xtrial,n,samples,outliers,noutliers,t,y,error)
-            write(300,1300) error
+            write(200,1300) error
+            write(300,*) fovo
+            write(400,*) iterations
             
         enddo
 
@@ -137,15 +141,19 @@ Program main
             print*
             write(*,1100) "Number of outliers: ",noutliers
             xk(:) = xinit_ls(2,:)
+
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
+            call quadatic_error(xtrial,n,samples,outliers,noutliers,t,y,error)
 
             Open(Unit = 110, File = "output/solutions_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
-            Open(Unit = 400, File = "output/error_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
+            Open(Unit = 210, File = "output/error_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
+            Open(Unit = 310, File = "output/fobj_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
+            Open(Unit = 410, File = "output/iterations_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
 
             write(110,1000) xtrial(1), xtrial(2), xtrial(3)
-
-            call quadatic_error(xtrial,n,samples,outliers,noutliers,t,y,error)
-            write(400,1300) error
+            write(210,1300) error
+            write(310,*) fovo
+            write(410,*) iterations
         enddo
 
         print*
@@ -157,21 +165,25 @@ Program main
             print*
             write(*,1100) "Number of outliers: ",noutliers
             xk(:) = xinit_ls(3,:)
+
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
+            call quadatic_error(xtrial,n,samples,outliers,noutliers,t,y,error)
 
             Open(Unit = 120, File = "output/solutions_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
-            Open(Unit = 500, File = "output/error_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
+            Open(Unit = 220, File = "output/error_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
+            Open(Unit = 320, File = "output/fobj_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
+            Open(Unit = 420, File = "output/iterations_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
 
             write(120,1000) xtrial(1), xtrial(2), xtrial(3)
-
-            call quadatic_error(xtrial,n,samples,outliers,noutliers,t,y,error)
-            write(500,1300) error
+            write(220,1300) error
+            write(320,*) fovo
+            write(420,*) iterations
     
         enddo
 
         Open(Unit = 200, File = "output/num_mixed_test.txt", ACCESS = "SEQUENTIAL")
-        write(200,1200) out_inf
-        write(200,1200) out_sup
+        write(500,1200) out_inf
+        write(500,1200) out_sup
         
         1000 format (ES12.6,1X,ES12.6,1X,ES12.6)
         1100 format (1X,A20,I2)
@@ -182,8 +194,11 @@ Program main
         close(110)
         close(120)
         close(200)
+        close(210)
+        close(220)
         close(300)
-        close(400)
+        close(310)
+        close(320)
         close(500)
         
     end subroutine mixed_test
@@ -196,8 +211,8 @@ Program main
         integer,        intent(inout) :: Idelta(samples),outliers(3*samples),m
         real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),y(samples)
 
-        integer :: q
-        real(kind=8) :: fovo,iterations
+        integer :: q, iterations
+        real(kind=8) :: fovo
 
         solutions(:,:) = 0.0d0
         q = samples - noutliers
@@ -242,8 +257,8 @@ Program main
         integer,        intent(in) :: q,noutliers,samples,n
         real(kind=8),   intent(in) :: t(samples),y(samples)
         integer,        intent(inout) :: Idelta(samples),m
-        real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),fovo,iterations
-        integer,        intent(inout) :: outliers(noutliers)
+        real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),fovo
+        integer,        intent(inout) :: outliers(noutliers),iterations
 
         integer, parameter  :: max_iter = 100000, max_iter_sub = 1000, kflag = 2
         integer             :: iter,iter_sub,i,j
