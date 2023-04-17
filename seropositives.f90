@@ -8,6 +8,7 @@ Program main
     real(kind=8), allocatable :: xtrial(:),faux(:),indices(:),nu_l(:),nu_u(:),opt_cond(:),&
                                  xstar(:),y(:),data(:,:),t(:)
     integer, allocatable :: Idelta(:),outliers(:)
+    real(kind=8), dimension(3,3) :: xinit_ls
 
     ! LOCAL SCALARS
     logical :: checkder
@@ -82,17 +83,24 @@ Program main
     l(1:n-1) = 0.0d0; l(n) = -1.0d+20
     u(1:n-1) = 1.0d+20; u(n) = 0.0d0
 
-    ! call single_test(5,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
+    Open(Unit = 200, File = "output/solutions_ls.txt", ACCESS = "SEQUENTIAL")
+    read(200,*) xinit_ls(1,:)
+    read(200,*) xinit_ls(2,:)
+    read(200,*) xinit_ls(3,:)
 
-    call mixed_test(1,10,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
+    close(200)
+
+    call single_test(2,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
+
+    ! call mixed_test(1,5,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
 
     CONTAINS
 
-    subroutine mixed_test(out_inf,out_sup,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
+    subroutine mixed_test(out_inf,out_sup,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
         implicit none
 
         integer,        intent(in) :: samples,n,out_inf,out_sup
-        real(kind=8),   intent(in) :: t(samples)
+        real(kind=8),   intent(in) :: t(samples),xinit_ls(3,3)
         integer,        intent(inout) :: Idelta(samples),outliers(3*samples),m
         real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),y(samples)
 
@@ -107,7 +115,7 @@ Program main
             q = samples - noutliers
             print*
             write(*,1100) "Number of outliers: ",noutliers
-            xk(:) = (/9.109573d0, 19.345421d0, 0.202798d0/)
+            xk(:) = xinit_ls(1,:)
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
 
             Open(Unit = 100, File = "output/solutions_mixed_measles.txt", ACCESS = "SEQUENTIAL")
@@ -128,7 +136,7 @@ Program main
             q = samples - noutliers
             print*
             write(*,1100) "Number of outliers: ",noutliers
-            xk(:) = (/0.201774d0, 0.289024d0, 0.000000d0/)
+            xk(:) = xinit_ls(2,:)
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
 
             Open(Unit = 110, File = "output/solutions_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
@@ -148,7 +156,7 @@ Program main
             q = samples - noutliers
             print*
             write(*,1100) "Number of outliers: ",noutliers
-            xk(:) = (/0.000108d0, 2.972498d0, 0.115333d0/)
+            xk(:) = xinit_ls(3,:)
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
 
             Open(Unit = 120, File = "output/solutions_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
@@ -180,11 +188,11 @@ Program main
         
     end subroutine mixed_test
 
-    subroutine single_test(noutliers,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
+    subroutine single_test(noutliers,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
         implicit none
 
         integer,        intent(in) :: samples,n,noutliers
-        real(kind=8),   intent(in) :: t(samples)
+        real(kind=8),   intent(in) :: t(samples),xinit_ls(3,3)
         integer,        intent(inout) :: Idelta(samples),outliers(3*samples),m
         real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),y(samples)
 
@@ -197,7 +205,7 @@ Program main
         print*
         Print*, "OVO Algorithm for Measles"
         y(:) = data(2,:)
-        xk(:) = (/9.109573d0, 19.345421d0, 0.202798d0/)
+        xk(:) = xinit_ls(1,:)
         call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers))
         ! print*,"Solution measles: ",xk
         solutions(1,:) = xk(:)
@@ -206,7 +214,7 @@ Program main
         print*
         Print*, "OVO Algorithm for Mumps"
         y(:) = data(3,:)
-        xk(:) = (/0.201774d0, 0.289024d0, 0.000000d0/)
+        xk(:) = xinit_ls(2,:)
         call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(noutliers+1:2*noutliers))
         ! print*,"Solution mumps: ",xk
         solutions(2,:) = xk(:)
@@ -215,7 +223,7 @@ Program main
         print*
         Print*, "OVO Algorithm for Rubella"
         y(:) = data(4,:)
-        xk(:) = (/0.000108d0, 2.972498d0, 0.115333d0/)
+        xk(:) = xinit_ls(3,:)
         call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(2*noutliers+1:3*noutliers))
         ! print*,"Solution rubella: ",xk
         solutions(3,:) = xk(:)
