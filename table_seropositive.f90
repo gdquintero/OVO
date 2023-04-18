@@ -80,10 +80,10 @@ program table
     do i = 1, n
         write(110,40) int(data(i,1)),'&',data(i,2),'&',data(i,3),'&',int(data(i,4)),&
                                      '&',data(i,5),'&',data(i,6),'&',int(data(i,7)),&
-                                     '&',data(i,8),'&',data(i,9),'&',int(data(i,10))
+                                     '&',data(i,8),'&',data(i,9),'&',int(data(i,10)),'\\'
     enddo
 
     40 format (I2,1X,A1,1X,ES9.3,1X,A1,1X,ES9.3,1x,A1,1X,I2,1X,A1,1X,ES9.3,1X,A1,1X,&
-                           ES9.3,1x,A1,1X,I2,1X,A1,1X,ES9.3,1X,A1,1X,ES9.3,1x,A1,1X,I2)
+                           ES9.3,1x,A1,1X,I2,1X,A1,1X,ES9.3,1X,A1,1X,ES9.3,1x,A1,1X,I2,1X,A2)
 
 end program
