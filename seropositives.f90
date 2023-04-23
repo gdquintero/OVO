@@ -50,8 +50,8 @@ Program main
     close(100)
 
     ! Number of days
-    t(:) = data(1,:)
-    ! t(:) = data(5,:)
+    ! t(:) = data(1,:)
+    t(:) = data(5,:)
 
     ! Coded subroutines
     coded(1:6)  = .true.  ! evalf, evalg, evalh, evalc, evaljac, evalhc
@@ -81,7 +81,7 @@ Program main
     vparam(1) = 'ITERATIONS-OUTPUT-DETAIL 0' 
 
     l(1:n-1) = 0.0d0; l(n) = -1.0d+20
-    u(1:n-1) = 1.0d0; u(n) = 0.0d0
+    u(1:n-1) = 1.0d+20; u(n) = 0.0d0
 
     Open(Unit = 200, File = "output/solutions_ls.txt", ACCESS = "SEQUENTIAL")
     read(200,*) xinit_ls(1,:)
@@ -90,9 +90,9 @@ Program main
 
     close(200)
 
-    ! call single_test(2,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
+    call single_test(6,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
 
-    call mixed_test(1,10,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
+    ! call mixed_test(1,10,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
 
     CONTAINS
 
