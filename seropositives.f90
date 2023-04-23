@@ -81,7 +81,7 @@ Program main
     vparam(1) = 'ITERATIONS-OUTPUT-DETAIL 0' 
 
     l(1:n-1) = 0.0d0; l(n) = -1.0d+20
-    u(1:n-1) = 1.0d+20; u(n) = 0.0d0
+    u(1:n-1) = 1.0d0; u(n) = 0.0d0
 
     Open(Unit = 200, File = "output/solutions_ls.txt", ACCESS = "SEQUENTIAL")
     read(200,*) xinit_ls(1,:)
@@ -116,6 +116,7 @@ Program main
             print*
             write(*,1100) "Number of outliers: ",noutliers
             xk(:) = xinit_ls(1,:)
+            ! xk(:) = 1.0d0
 
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
             call quadatic_error(xtrial,n,samples,outliers,noutliers,t,y,error)
@@ -141,6 +142,7 @@ Program main
             print*
             write(*,1100) "Number of outliers: ",noutliers
             xk(:) = xinit_ls(2,:)
+            ! xk(:) = 1.0d0
 
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
             call quadatic_error(xtrial,n,samples,outliers,noutliers,t,y,error)
@@ -165,6 +167,7 @@ Program main
             print*
             write(*,1100) "Number of outliers: ",noutliers
             xk(:) = xinit_ls(3,:)
+            ! xk(:) = 1.0d0
 
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
             call quadatic_error(xtrial,n,samples,outliers,noutliers,t,y,error)
