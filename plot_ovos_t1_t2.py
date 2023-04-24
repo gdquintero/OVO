@@ -5,21 +5,14 @@ import models
 
 # 'ro',mfc='none',ms=10)
 
-def plot_solutions(ind,df_seropositives,df_sol_ovo,df_sol_ls,sero_outliers,noutliers):
+def plot_solutions(ind,df_seropositives,df_sol_ovo1,df_sol_ovo2,df_sol_ls):
     t = np.linspace(0,70,1000)
     disease = ["Measles","Mumps","Rubella"]
     plt.plot(df_seropositives[0].values,df_seropositives[ind].values,"o")
     # plt.plot(t,models.F(t,*solutions_farrington[i-1]),label="Farrington")
     plt.plot(t,models.F(t,*df_sol_ls.iloc[ind-1].values),label="Least Squares")
-    plt.plot(t,models.F(t,*df_sol_ovo.iloc[ind-1].values),label="OVO")
-    plt.plot(sero_outliers[0],sero_outliers[1],'ro',mfc='none',ms=10)
-
-    for i in range(noutliers):
-        point1 = [sero_outliers[0,i],models.F(sero_outliers[0,i],*df_sol_ovo.iloc[ind-1].values)]
-        point2 = [sero_outliers[0,i],sero_outliers[1,i]]
-        x_values = [point1[0], point2[0]]
-        y_values = [point1[1], point2[1]]
-        plt.plot(x_values, y_values, 'k', linestyle="--")
+    plt.plot(t,models.F(t,*df_sol_ovo1.iloc[ind-1].values),label="OVO with initial point")
+    plt.plot(t,models.F(t,*df_sol_ovo2.iloc[ind-1].values),label="OVO with midpoint")
 
     plt.legend()
     plt.title(disease[ind-1])
