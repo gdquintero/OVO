@@ -90,9 +90,9 @@ Program main
 
     close(200)
 
-    ! call single_test(6,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
+    call single_test(2,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
 
-    call mixed_test(1,10,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
+    ! call mixed_test(1,10,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
 
     CONTAINS
 

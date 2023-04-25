@@ -10,10 +10,12 @@ def plot_mixed(ind,t,inf,df_seropositives,df_mixed):
 
     for i in range(n):
         plt.plot(t,models.F(t,*df_mixed.iloc[i].values),label="Outliers: "+str(inf+i))
+        plt.title(disease[ind-1])
         plt.legend()
 
-    plt.title(disease[ind-1])
-    plt.show()
+    plt.savefig(disease[ind-1]+".pdf",bbox_inches = "tight")
+    # plt.show()
+    plt.close()
 
 df_seropositives = pd.read_table("output/seropositives.txt",delimiter=" ",header=None,skiprows=1)
 df_mixed_measles = pd.read_table("output/solutions_mixed_measles.txt",delimiter=" ",header=None,skiprows=0)
