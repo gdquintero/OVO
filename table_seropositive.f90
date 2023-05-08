@@ -1,10 +1,10 @@
 program table
     implicit none
 
-    integer :: i,inf,sup,n
+    integer :: i,inf,sup,n,allocerr
     integer, dimension(29) :: age
     real*8, dimension(29) :: measles,mumps,rubella
-    real*8, dimension(10,10) :: data
+    real*8, allocatable :: data(:,:)
 
     measles(:) = (/&
         0.207d0,0.301d0,0.409d0,0.589d0,0.757d0,0.669d0,0.797d0,0.818d0,0.866d0,0.859d0,&
@@ -31,9 +31,6 @@ program table
     open(UNIT = 200, FILE = "output/fobj_mixed_measles.txt", ACCESS = "SEQUENTIAL")
     open(UNIT = 210, FILE = "output/fobj_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
     open(UNIT = 220, FILE = "output/fobj_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
-    open(UNIT = 300, FILE = "output/error_mixed_measles.txt", ACCESS = "SEQUENTIAL")
-    open(UNIT = 310, FILE = "output/error_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
-    open(UNIT = 320, FILE = "output/error_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
     open(UNIT = 400, FILE = "output/iterations_mixed_measles.txt", ACCESS = "SEQUENTIAL")
     open(UNIT = 410, FILE = "output/iterations_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
     open(UNIT = 420, FILE = "output/iterations_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
@@ -52,10 +49,10 @@ program table
     write(100,30) '$[',age(15),',',age(16),')$','&',measles(15),'&',mumps(15),'&',rubella(15),'&','&','&','\\'
 
     10 format (A2,I2,A1,I2,A2,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,&
-                A2,I2,A1,I2,A2,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A2)
+               A2,I2,A1,I2,A2,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A2)
 
     20 format (A2,I2,A1,I2,A2,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X&
-                A2,I2,A10,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A2)
+               A2,I2,A10,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A2)
 
     30 format (A2,I2,A1,I2,A2,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,A1,1X,A1,1X,A2)
 
@@ -64,26 +61,29 @@ program table
 
     n = sup - inf + 1
 
+    allocate(data(n,7),stat=allocerr)
+
+    if ( allocerr .ne. 0 ) then
+        write(*,*) 'Allocation error in main program'
+        stop
+    end if
+
     do i = 1, n
         data(i,1) = 29 - i
         read(200,*) data(i,2)
-        read(300,*) data(i,3)
-        read(400,*) data(i,4)
-        read(210,*) data(i,5)
-        read(310,*) data(i,6)
-        read(410,*) data(i,7)
-        read(220,*) data(i,8)
-        read(320,*) data(i,9)
-        read(420,*) data(i,10)
+        read(400,*) data(i,3)
+        read(210,*) data(i,4)
+        read(410,*) data(i,5)
+        read(220,*) data(i,6)
+        read(420,*) data(i,7)
     enddo
 
     do i = 1, n
-        write(110,40) int(data(i,1)),'&',data(i,2),'&',data(i,3),'&',int(data(i,4)),&
-                                     '&',data(i,5),'&',data(i,6),'&',int(data(i,7)),&
-                                     '&',data(i,8),'&',data(i,9),'&',int(data(i,10)),'\\'
+        write(110,40) int(data(i,1)),'&',data(i,2),'&',int(data(i,3)),&
+                                     '&',data(i,4),'&',int(data(i,5)),&
+                                     '&',data(i,6),'&',int(data(i,7)),'\\'
     enddo
 
-    40 format (I2,1X,A1,1X,ES9.3,1X,A1,1X,ES9.3,1x,A1,1X,I2,1X,A1,1X,ES9.3,1X,A1,1X,&
-                           ES9.3,1x,A1,1X,I2,1X,A1,1X,ES9.3,1X,A1,1X,ES9.3,1x,A1,1X,I2,1X,A2)
+    40 format (I4,1X,A1,1X,ES9.3,1X,A1,1X,I4,1X,A1,1X,ES9.3,1X,A1,1X,I4,1X,A1,1X,ES9.3,1X,A1,1X,I4,1X,A2)
 
 end program

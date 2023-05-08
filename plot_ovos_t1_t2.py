@@ -8,7 +8,7 @@ import models
 def plot_solutions(ind,df_seropositives,df_sol_ovo1,df_sol_ovo2,df_sol_ls):
     t = np.linspace(0,70,1000)
     disease = ["Measles","Mumps","Rubella"]
-    plt.plot(df_seropositives[0].values,df_seropositives[ind].values,"o")
+    plt.plot(df_seropositives[0].values,df_seropositives[ind].values,"ko")
     # plt.plot(t,models.F(t,*solutions_farrington[i-1]),label="Farrington")
     plt.plot(t,models.F(t,*df_sol_ls.iloc[ind-1].values),label="Least Squares")
     plt.plot(t,models.F(t,*df_sol_ovo1.iloc[ind-1].values),label="OVO with initial point")

@@ -49,10 +49,6 @@ Program main
 
     close(100)
 
-    ! Number of days
-    t(:) = data(1,:)
-    ! t(:) = data(5,:)
-
     ! Coded subroutines
     coded(1:6)  = .true.  ! evalf, evalg, evalh, evalc, evaljac, evalhc
     coded(7:11) = .false. ! evalfc,evalgjac,evalgjacp,evalhl,evalhlp
@@ -90,9 +86,13 @@ Program main
 
     close(200)
 
-    call single_test(2,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
+     ! Number of days
+    t(:) = data(1,:)
+    ! t(:) = data(5,:)
 
-    ! call mixed_test(1,10,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
+    ! call single_test(2,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
+
+    call mixed_test(1,10,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
 
     CONTAINS
 
@@ -111,23 +111,22 @@ Program main
         Print*, "OVO Algorithm for Measles"
         y(:) = data(2,:)
 
+        xk(:) = 1.0d0
+
         do noutliers = out_inf,out_sup
             q = samples - noutliers
             print*
             write(*,1100) "Number of outliers: ",noutliers
-            xk(:) = xinit_ls(1,:)
+
             ! xk(:) = 1.0d0
 
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
-            call quadatic_error(xtrial,n,samples,outliers,noutliers,t,y,error)
 
             Open(Unit = 100, File = "output/solutions_mixed_measles.txt", ACCESS = "SEQUENTIAL")
-            Open(Unit = 200, File = "output/error_mixed_measles.txt", ACCESS = "SEQUENTIAL")
             Open(Unit = 300, File = "output/fobj_mixed_measles.txt", ACCESS = "SEQUENTIAL")
             Open(Unit = 400, File = "output/iterations_mixed_measles.txt", ACCESS = "SEQUENTIAL")
 
             write(100,1000) xtrial(1), xtrial(2), xtrial(3)
-            write(200,1300) error
             write(300,*) fovo
             write(400,*) iterations
             
@@ -136,24 +135,21 @@ Program main
         print*
         Print*, "OVO Algorithm for Mumps"
         y(:) = data(3,:)
+        xk(:) = 1.0d0
 
         do noutliers = out_inf,out_sup
             q = samples - noutliers
             print*
             write(*,1100) "Number of outliers: ",noutliers
-            xk(:) = xinit_ls(2,:)
             ! xk(:) = 1.0d0
 
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
-            call quadatic_error(xtrial,n,samples,outliers,noutliers,t,y,error)
 
             Open(Unit = 110, File = "output/solutions_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
-            Open(Unit = 210, File = "output/error_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
             Open(Unit = 310, File = "output/fobj_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
             Open(Unit = 410, File = "output/iterations_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
 
             write(110,1000) xtrial(1), xtrial(2), xtrial(3)
-            write(210,1300) error
             write(310,*) fovo
             write(410,*) iterations
         enddo
@@ -161,24 +157,21 @@ Program main
         print*
         Print*, "OVO Algorithm for Rubella"
         y(:) = data(4,:)
+        xk(:) = 1.0d0
 
         do noutliers = out_inf,out_sup
             q = samples - noutliers
             print*
             write(*,1100) "Number of outliers: ",noutliers
-            xk(:) = xinit_ls(3,:)
             ! xk(:) = 1.0d0
 
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
-            call quadatic_error(xtrial,n,samples,outliers,noutliers,t,y,error)
 
             Open(Unit = 120, File = "output/solutions_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
-            Open(Unit = 220, File = "output/error_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
             Open(Unit = 320, File = "output/fobj_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
             Open(Unit = 420, File = "output/iterations_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
 
             write(120,1000) xtrial(1), xtrial(2), xtrial(3)
-            write(220,1300) error
             write(320,*) fovo
             write(420,*) iterations
     
@@ -191,14 +184,10 @@ Program main
         1000 format (ES12.6,1X,ES12.6,1X,ES12.6)
         1100 format (1X,A20,I2)
         1200 format (I2)
-        1300 format (ES12.6)
 
         close(100)
         close(110)
         close(120)
-        close(200)
-        close(210)
-        close(220)
         close(300)
         close(310)
         close(320)
@@ -272,7 +261,7 @@ Program main
         delta   = 1.0d-4
         sigmin  = 1.0d-2
         iter    = 0
-        xk(:)   = 0.1d0
+        ! xk(:)   = 0.1d0
         indices(:) = (/(i, i = 1, samples)/)
     
         ! Scenarios
