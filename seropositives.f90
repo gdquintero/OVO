@@ -9,7 +9,7 @@ Program main
                                  xstar(:),y(:),data(:,:),t(:)
     integer, allocatable :: Idelta(:),outliers(:)
     real(kind=8), dimension(3,3) :: xinit_ls
-
+    
     ! LOCAL SCALARS
     logical :: checkder
     integer :: hnnzmax,inform,jcnnzmax,m,n,nvparam
