@@ -111,7 +111,7 @@ Program main
         Print*, "OVO Algorithm for Measles"
         y(:) = data(2,:)
 
-        xk(:) = 1.0d0
+        xk(:) = 1.0d-1
 
         do noutliers = out_inf,out_sup
             q = samples - noutliers
