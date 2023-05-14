@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 def plot_seropositive(sero,x,y):
-    plt.ylim([0,1.1])
+    # plt.ylim([0,1.1])
     # t = np.linspace(0,70,1000)
 
     plt.plot(x,y,"o",ls=":")
@@ -38,6 +38,30 @@ sero_rubella = np.array([
 
 samples = len(age)
 
+# Adding outliers manually
+deviation = 0.2
+samples += 4
+
+age = np.insert(age,15,16)
+sero_measles = np.insert(sero_measles,15,(sero_measles[14]+sero_measles[15])/2 + deviation)
+sero_mumps = np.insert(sero_mumps,15,(sero_mumps[14]+sero_mumps[15])/2 + deviation)
+sero_rubella = np.insert(sero_rubella,15,(sero_rubella[14]+sero_rubella[15])/2 + deviation)
+
+age = np.insert(age,17,18)
+sero_measles = np.insert(sero_measles,17,(sero_measles[16]+sero_measles[17])/2 + deviation)
+sero_mumps = np.insert(sero_mumps,17,(sero_mumps[16]+sero_mumps[17])/2 + deviation)
+sero_rubella = np.insert(sero_rubella,17,(sero_rubella[16]+sero_rubella[17])/2 + deviation)
+
+age = np.insert(age,19,20)
+sero_measles = np.insert(sero_measles,19,(sero_measles[18]+sero_measles[19])/2 + deviation)
+sero_mumps = np.insert(sero_mumps,19,(sero_mumps[18]+sero_mumps[19])/2 + deviation)
+sero_rubella = np.insert(sero_rubella,19,(sero_rubella[18]+sero_rubella[19])/2 + deviation)
+
+age = np.insert(age,21,22)
+sero_measles = np.insert(sero_measles,21,(sero_measles[20]+sero_measles[21])/2 + deviation)
+sero_mumps = np.insert(sero_mumps,21,(sero_mumps[20]+sero_mumps[21])/2 + deviation)
+sero_rubella = np.insert(sero_rubella,21,(sero_rubella[20]+sero_rubella[21])/2 + deviation)
+
 age_midpoint = np.empty(samples)
 age_midpoint[:-1] = (age[:-1] + age[1:]) / 2
 age_midpoint[-1]  = 70
@@ -48,11 +72,11 @@ with open("output/seropositives.txt","w") as f:
         f.write("%i %f %f %f %f\n" % (age[i],sero_measles[i],sero_mumps[i],sero_rubella[i],age_midpoint[i]))
 
 
-# Solucion exacta (del paper farrington)
-sol_measles = np.array([0.197,0.287,0.021])
-sol_mumps   = np.array([0.156,0.250,0.0])
-sol_rubella = np.array([0.0628,0.178,0.020])
+# # Solucion exacta (del paper farrington)
+# sol_measles = np.array([0.197,0.287,0.021])
+# sol_mumps   = np.array([0.156,0.250,0.0])
+# sol_rubella = np.array([0.0628,0.178,0.020])
 
-# plot_seropositive("measles",age,sero_measles)
-# plot_seropositive("mumps",age,sero_mumps)
-# plot_seropositive("rubella",age,sero_rubella)
+plot_seropositive("measles",age,sero_measles)
+plot_seropositive("mumps",age,sero_mumps)
+plot_seropositive("rubella",age,sero_rubella)
