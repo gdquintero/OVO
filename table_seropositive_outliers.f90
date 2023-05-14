@@ -19,8 +19,8 @@ program table
     do i = 1, samples
         age(i) = int(disease_data(i,1))
         measles(i) = disease_data(i,2)
-        measles(i) = disease_data(i,3)
-        measles(i) = disease_data(i,4)
+        mumps(i) = disease_data(i,3)
+        rubella(i) = disease_data(i,4)
     enddo
 
     open(UNIT = 100, FILE = "output/latex_sero.txt", ACCESS = "SEQUENTIAL")
@@ -43,7 +43,7 @@ program table
         end if
     end do
 
-    write(100,30) '$[',age(17),',',age(18),')$','&',measles(16),'&',mumps(16),'&',rubella(16),'&','&','&','\\'
+    write(100,30) '$[',age(17),',',age(18),')$','&',measles(17),'&',mumps(17),'&',rubella(17),'&','&','&','\\'
 
     10 format (A2,I2,A1,I2,A2,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,&
                A2,I2,A1,I2,A2,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A2)
@@ -53,34 +53,34 @@ program table
 
     30 format (A2,I2,A1,I2,A2,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,A1,1X,A1,1X,A2)
 
-    ! read(500,*) inf
-    ! read(500,*) sup
+    read(500,*) inf
+    read(500,*) sup
 
-    ! n = sup - inf + 1
+    n = sup - inf + 1
 
-    ! allocate(data(n,7),stat=allocerr)
+    allocate(data(n,7),stat=allocerr)
 
-    ! if ( allocerr .ne. 0 ) then
-    !     write(*,*) 'Allocation error in main program'
-    !     stop
-    ! end if
+    if ( allocerr .ne. 0 ) then
+        write(*,*) 'Allocation error in main program'
+        stop
+    end if
 
-    ! do i = 1, n
-    !     data(i,1) = 29 - i
-    !     read(200,*) data(i,2)
-    !     read(400,*) data(i,3)
-    !     read(210,*) data(i,4)
-    !     read(410,*) data(i,5)
-    !     read(220,*) data(i,6)
-    !     read(420,*) data(i,7)
-    ! enddo
+    do i = 1, n
+        data(i,1) = 33 - i
+        read(200,*) data(i,2)
+        read(400,*) data(i,3)
+        read(210,*) data(i,4)
+        read(410,*) data(i,5)
+        read(220,*) data(i,6)
+        read(420,*) data(i,7)
+    enddo
 
-    ! do i = 1, n
-    !     write(110,40) int(data(i,1)),'&',data(i,2),'&',int(data(i,3)),&
-    !                                  '&',data(i,4),'&',int(data(i,5)),&
-    !                                  '&',data(i,6),'&',int(data(i,7)),'\\'
-    ! enddo
+    do i = 1, n
+        write(110,40) int(data(i,1)),'&',data(i,2),'&',int(data(i,3)),&
+                                     '&',data(i,4),'&',int(data(i,5)),&
+                                     '&',data(i,6),'&',int(data(i,7)),'\\'
+    enddo
 
-    ! 40 format (I4,1X,A1,1X,ES9.3,1X,A1,1X,I4,1X,A1,1X,ES9.3,1X,A1,1X,I4,1X,A1,1X,ES9.3,1X,A1,1X,I4,1X,A2)
+    40 format (I4,1X,A1,1X,ES9.3,1X,A1,1X,I4,1X,A1,1X,ES9.3,1X,A1,1X,I4,1X,A1,1X,ES9.3,1X,A1,1X,I4,1X,A2)
 
 end program

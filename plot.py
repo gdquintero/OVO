@@ -10,7 +10,7 @@ def plot_solutions(ind,df_seropositives,df_sol_ovo,df_sol_ls,sero_outliers,noutl
     disease = ["Measles","Mumps","Rubella"]
     plt.plot(df_seropositives[0].values,df_seropositives[ind].values,"o")
     # plt.plot(t,models.F(t,*solutions_farrington[i-1]),label="Farrington")
-    plt.plot(t,models.F(t,*df_sol_ls.iloc[ind-1].values),label="Least Squares")
+    # plt.plot(t,models.F(t,*df_sol_ls.iloc[ind-1].values),label="Least Squares")
     plt.plot(t,models.F(t,*df_sol_ovo.iloc[ind-1].values),label="OVO")
     plt.plot(sero_outliers[0],sero_outliers[1],'ro',mfc='none',ms=10)
 

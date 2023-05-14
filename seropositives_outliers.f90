@@ -90,7 +90,7 @@ Program main
     t(:) = data(1,:)
     ! t(:) = data(5,:)
 
-    ! call single_test(2,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
+    ! call single_test(4,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
 
     call mixed_test(1,10,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
 

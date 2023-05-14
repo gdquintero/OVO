@@ -1,4 +1,4 @@
-program table
+-program table
     implicit none
 
     integer :: i,inf,sup,n,allocerr

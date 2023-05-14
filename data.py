@@ -39,10 +39,11 @@ sero_rubella = np.array([
 samples = len(age)
 
 # Adding outliers manually
-deviation = 0.2
+deviation = 0.5
 samples += 4
 
 age = np.insert(age,15,16)
+
 sero_measles = np.insert(sero_measles,15,(sero_measles[14]+sero_measles[15])/2 + deviation)
 sero_mumps = np.insert(sero_mumps,15,(sero_mumps[14]+sero_mumps[15])/2 + deviation)
 sero_rubella = np.insert(sero_rubella,15,(sero_rubella[14]+sero_rubella[15])/2 + deviation)

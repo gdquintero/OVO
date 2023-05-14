@@ -14,7 +14,7 @@ def plot_mixed(ind,t,inf,df_seropositives,df_mixed):
         plt.legend()
 
     plt.savefig(disease[ind-1]+".pdf",bbox_inches = "tight")
-    # plt.show()
+    plt.show()
     plt.close()
 
 df_seropositives = pd.read_table("output/seropositives.txt",delimiter=" ",header=None,skiprows=1)
