@@ -111,7 +111,8 @@ Program main
         Print*, "OVO Algorithm for Measles"
         y(:) = data(2,:)
 
-        xk(:) = 1.0d-1
+        ! xk(:) = (/0.197d0,0.287d0,0.021d0/)
+        xk = 1.0d0
 
         do noutliers = out_inf,out_sup
             q = samples - noutliers
@@ -135,8 +136,8 @@ Program main
         print*
         Print*, "OVO Algorithm for Mumps"
         y(:) = data(3,:)
-        xk(:) = 1.0d0
-
+        ! xk(:) = (/0.156d0,0.250d0,0.0d0/)
+        xk = 1.0d0
         do noutliers = out_inf,out_sup
             q = samples - noutliers
             print*
@@ -157,7 +158,8 @@ Program main
         print*
         Print*, "OVO Algorithm for Rubella"
         y(:) = data(4,:)
-        xk(:) = 1.0d0
+        ! xk(:) = (/0.0628d0,0.178d0,0.020d0/)
+        xk = 1.0d0
 
         do noutliers = out_inf,out_sup
             q = samples - noutliers
