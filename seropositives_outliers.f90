@@ -87,8 +87,8 @@ Program main
     close(200)
 
      ! Number of days
-    t(:) = data(1,:)
-    ! t(:) = data(5,:)
+    ! t(:) = data(1,:)
+    t(:) = data(5,:)
 
     ! call single_test(4,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
 
@@ -112,7 +112,7 @@ Program main
         y(:) = data(2,:)
 
         ! xk(:) = (/0.197d0,0.287d0,0.021d0/)
-        xk = 1.0d0
+        xk = 1.0d-1
 
         do noutliers = out_inf,out_sup
             q = samples - noutliers
@@ -137,7 +137,7 @@ Program main
         Print*, "OVO Algorithm for Mumps"
         y(:) = data(3,:)
         ! xk(:) = (/0.156d0,0.250d0,0.0d0/)
-        xk = 1.0d0
+        xk = 1.0d-1
         do noutliers = out_inf,out_sup
             q = samples - noutliers
             print*
@@ -159,7 +159,7 @@ Program main
         Print*, "OVO Algorithm for Rubella"
         y(:) = data(4,:)
         ! xk(:) = (/0.0628d0,0.178d0,0.020d0/)
-        xk = 1.0d0
+        xk = 1.0d-1
 
         do noutliers = out_inf,out_sup
             q = samples - noutliers
