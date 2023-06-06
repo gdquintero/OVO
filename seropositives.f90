@@ -259,7 +259,8 @@ Program main
         alpha   = 0.5d0
         epsilon = 1.0d-4
         delta   = 1.0d-4
-        sigmin  = 1.0d-2
+        ! sigmin  = 1.0d-2
+        sigmin = 1.0d0
         iter    = 0
         ! xk(:)   = 0.1d0
         indices(:) = (/(i, i = 1, samples)/)
