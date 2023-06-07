@@ -92,7 +92,7 @@ Program main
 
     ! call single_test(2,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
 
-    call mixed_test(1,10,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
+    call mixed_test(1,2,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
 
     CONTAINS
 
@@ -120,7 +120,7 @@ Program main
 
             ! xk(:) = 1.0d0
 
-            call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
+            call ovo_algorithm(q,1,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:1),fovo,iterations)
 
             Open(Unit = 100, File = "output/solutions_mixed_measles.txt", ACCESS = "SEQUENTIAL")
             Open(Unit = 300, File = "output/fobj_mixed_measles.txt", ACCESS = "SEQUENTIAL")
