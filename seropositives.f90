@@ -8,7 +8,6 @@ Program main
     real(kind=8), allocatable :: xtrial(:),faux(:),indices(:),nu_l(:),nu_u(:),opt_cond(:),&
                                  xstar(:),y(:),data(:,:),t(:)
     integer, allocatable :: Idelta(:),outliers(:)
-    real(kind=8), dimension(3,3) :: xinit_ls
     
     ! LOCAL SCALARS
     logical :: checkder
@@ -79,33 +78,27 @@ Program main
     l(1:n-1) = 0.0d0; l(n) = -1.0d+20
     u(1:n-1) = 1.0d+20; u(n) = 0.0d0
 
-    Open(Unit = 200, File = "output/solutions_ls.txt", ACCESS = "SEQUENTIAL")
-    read(200,*) xinit_ls(1,:)
-    read(200,*) xinit_ls(2,:)
-    read(200,*) xinit_ls(3,:)
 
-    close(200)
-
-     ! Number of days
+    ! Number of days
     t(:) = data(1,:)
     ! t(:) = data(5,:)
 
     ! call single_test(2,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
 
-    call mixed_test(1,2,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
+    call mixed_test(1,5,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
 
     CONTAINS
 
-    subroutine mixed_test(out_inf,out_sup,outliers,t,y,indices,Idelta,samples,m,n,xinit_ls,xtrial)
+    subroutine mixed_test(out_inf,out_sup,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
         implicit none
 
         integer,        intent(in) :: samples,n,out_inf,out_sup
-        real(kind=8),   intent(in) :: t(samples),xinit_ls(3,3)
+        real(kind=8),   intent(in) :: t(samples)
         integer,        intent(inout) :: Idelta(samples),outliers(3*samples),m
         real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),y(samples)
 
         integer :: noutliers,q,iterations
-        real(kind=8) :: error,fovo
+        real(kind=8) :: fovo
 
         print*
         Print*, "OVO Algorithm for Measles"
@@ -120,7 +113,7 @@ Program main
 
             ! xk(:) = 1.0d0
 
-            call ovo_algorithm(q,1,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:1),fovo,iterations)
+            call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
 
             Open(Unit = 100, File = "output/solutions_mixed_measles.txt", ACCESS = "SEQUENTIAL")
             Open(Unit = 300, File = "output/fobj_mixed_measles.txt", ACCESS = "SEQUENTIAL")
@@ -132,50 +125,50 @@ Program main
             
         enddo
 
-        print*
-        Print*, "OVO Algorithm for Mumps"
-        y(:) = data(3,:)
-        xk(:) = 1.0d0
+        ! print*
+        ! Print*, "OVO Algorithm for Mumps"
+        ! y(:) = data(3,:)
+        ! xk(:) = 1.0d0
 
-        do noutliers = out_inf,out_sup
-            q = samples - noutliers
-            print*
-            write(*,1100) "Number of outliers: ",noutliers
-            ! xk(:) = 1.0d0
+        ! do noutliers = out_inf,out_sup
+        !     q = samples - noutliers
+        !     print*
+        !     write(*,1100) "Number of outliers: ",noutliers
+        !     ! xk(:) = 1.0d0
 
-            call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
+        !     call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
 
-            Open(Unit = 110, File = "output/solutions_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
-            Open(Unit = 310, File = "output/fobj_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
-            Open(Unit = 410, File = "output/iterations_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
+        !     Open(Unit = 110, File = "output/solutions_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
+        !     Open(Unit = 310, File = "output/fobj_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
+        !     Open(Unit = 410, File = "output/iterations_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
 
-            write(110,1000) xtrial(1), xtrial(2), xtrial(3)
-            write(310,*) fovo
-            write(410,*) iterations
-        enddo
+        !     write(110,1000) xtrial(1), xtrial(2), xtrial(3)
+        !     write(310,*) fovo
+        !     write(410,*) iterations
+        ! enddo
 
-        print*
-        Print*, "OVO Algorithm for Rubella"
-        y(:) = data(4,:)
-        xk(:) = 1.0d0
+        ! print*
+        ! Print*, "OVO Algorithm for Rubella"
+        ! y(:) = data(4,:)
+        ! xk(:) = 1.0d0
 
-        do noutliers = out_inf,out_sup
-            q = samples - noutliers
-            print*
-            write(*,1100) "Number of outliers: ",noutliers
-            ! xk(:) = 1.0d0
+        ! do noutliers = out_inf,out_sup
+        !     q = samples - noutliers
+        !     print*
+        !     write(*,1100) "Number of outliers: ",noutliers
+        !     ! xk(:) = 1.0d0
 
-            call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
+        !     call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
 
-            Open(Unit = 120, File = "output/solutions_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
-            Open(Unit = 320, File = "output/fobj_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
-            Open(Unit = 420, File = "output/iterations_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
+        !     Open(Unit = 120, File = "output/solutions_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
+        !     Open(Unit = 320, File = "output/fobj_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
+        !     Open(Unit = 420, File = "output/iterations_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
 
-            write(120,1000) xtrial(1), xtrial(2), xtrial(3)
-            write(320,*) fovo
-            write(420,*) iterations
+        !     write(120,1000) xtrial(1), xtrial(2), xtrial(3)
+        !     write(320,*) fovo
+        !     write(420,*) iterations
     
-        enddo
+        ! enddo
 
         Open(Unit = 500, File = "output/num_mixed_test.txt", ACCESS = "SEQUENTIAL")
         write(500,1200) out_inf
