@@ -39,7 +39,7 @@ sero_rubella = np.array([
 samples = len(age)
 
 # Adding outliers manually
-deviation = 0.5
+deviation = 0.2
 samples += 4
 
 age = np.insert(age,15,16)
