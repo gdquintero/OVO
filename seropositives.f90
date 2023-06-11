@@ -111,8 +111,6 @@ Program main
             print*
             write(*,1100) "Number of outliers: ",noutliers
 
-            ! xk(:) = 1.0d0
-
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
 
             Open(Unit = 100, File = "output/solutions_mixed_measles.txt", ACCESS = "SEQUENTIAL")
@@ -134,7 +132,6 @@ Program main
             q = samples - noutliers
             print*
             write(*,1100) "Number of outliers: ",noutliers
-            ! xk(:) = 1.0d0
 
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
 
@@ -156,7 +153,6 @@ Program main
             q = samples - noutliers
             print*
             write(*,1100) "Number of outliers: ",noutliers
-            ! xk(:) = 1.0d0
 
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
 
@@ -206,7 +202,8 @@ Program main
         print*
         Print*, "OVO Algorithm for Measles"
         y(:) = data(2,:)
-        xk(:) = (/0.197d0,0.287d0,0.021d0/)
+        ! xk(:) = (/0.197d0,0.287d0,0.021d0/)
+        xk = 1.0d-1
         call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
         ! print*,"Solution measles: ",xk
         solutions(1,:) = xk(:)
@@ -215,7 +212,8 @@ Program main
         print*
         Print*, "OVO Algorithm for Mumps"
         y(:) = data(3,:)
-        xk(:) = (/0.156d0,0.250d0,0.0d0/)
+        ! xk(:) = (/0.156d0,0.250d0,0.0d0/)
+        xk = 1.0d-1
         call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(noutliers+1:2*noutliers),fovo,iterations)
         ! print*,"Solution mumps: ",xk
         solutions(2,:) = xk(:)
@@ -224,7 +222,8 @@ Program main
         print*
         Print*, "OVO Algorithm for Rubella"
         y(:) = data(4,:)
-        xk(:) = (/0.0628d0,0.178d0,0.020d0/)
+        ! xk(:) = (/0.0628d0,0.178d0,0.020d0/)
+        xk = 1.0d-1
         call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(2*noutliers+1:3*noutliers),fovo,iterations)
         ! print*,"Solution rubella: ",xk
         solutions(3,:) = xk(:)
@@ -250,10 +249,10 @@ Program main
         real(kind=8)        :: gaux1,gaux2,a,b,c,ebt,terminate,alpha,epsilon,delta,sigmin,gamma
 
         alpha   = 0.5d0
-        epsilon = 1.0d-4
-        delta   = 0.0005
+        epsilon = 1.0d-3
+        delta   = 1.0d-4
         sigmin  = 1.0d0
-        gamma   = 10.0d0
+        gamma   = 5.0d0
         iter    = 0
         ! xk(:)   = 0.1d0
         indices(:) = (/(i, i = 1, samples)/)
@@ -383,7 +382,7 @@ Program main
             fxk = fxtrial
             xk(1:n-1) = xtrial(1:n-1)
 
-            if (terminate .le. epsilon) exit
+            if (terminate .lt. epsilon) exit
             if (iter .ge. max_iter) exit
     
             call mount_Idelta(faux,delta,q,indices,samples,Idelta,m)

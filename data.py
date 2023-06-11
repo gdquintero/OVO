@@ -39,48 +39,22 @@ sero_rubella = np.array([
 samples = len(age)
 
 # Adding outliers manually
-deviation = 0.2
-samples += 4
+deviation = 0.5
 
-age = np.insert(age,15,16)
-sero_measles = np.insert(sero_measles,15,(sero_measles[14]+sero_measles[15])/2 + deviation)
-sero_mumps = np.insert(sero_mumps,15,(sero_mumps[14]+sero_mumps[15])/2 + deviation)
-sero_rubella = np.insert(sero_rubella,15,(sero_rubella[14]+sero_rubella[15])/2 + deviation)
+sero_measles[15] = sero_measles[15] - deviation
+sero_measles[20] = sero_measles[20] - deviation
+sero_measles[25] = sero_measles[25] - deviation
+sero_measles[28] = sero_measles[28] - deviation
 
-age = np.insert(age,17,18)
-sero_measles = np.insert(sero_measles,17,(sero_measles[16]+sero_measles[17])/2 + deviation)
-sero_mumps = np.insert(sero_mumps,17,(sero_mumps[16]+sero_mumps[17])/2 + deviation)
-sero_rubella = np.insert(sero_rubella,17,(sero_rubella[16]+sero_rubella[17])/2 + deviation)
+sero_mumps[15] = sero_mumps[15] - deviation
+sero_mumps[20] = sero_mumps[20] - deviation
+sero_mumps[25] = sero_mumps[25] - deviation
+sero_mumps[28] = sero_mumps[28] - deviation
 
-age = np.insert(age,19,20)
-sero_measles = np.insert(sero_measles,19,(sero_measles[18]+sero_measles[19])/2 + deviation)
-sero_mumps = np.insert(sero_mumps,19,(sero_mumps[18]+sero_mumps[19])/2 + deviation)
-sero_rubella = np.insert(sero_rubella,19,(sero_rubella[18]+sero_rubella[19])/2 + deviation)
-
-age = np.insert(age,21,22)
-sero_measles = np.insert(sero_measles,21,(sero_measles[20]+sero_measles[21])/2 + deviation)
-sero_mumps = np.insert(sero_mumps,21,(sero_mumps[20]+sero_mumps[21])/2 + deviation)
-sero_rubella = np.insert(sero_rubella,21,(sero_rubella[20]+sero_rubella[21])/2 + deviation)
-
-# age = np.append(age,75)
-# sero_measles = np.append(sero_measles,(sero_measles[-2]+sero_measles[-1])/2 + deviation)
-# sero_mumps = np.append(sero_mumps,(sero_mumps[-2]+sero_mumps[-1])/2 + deviation)
-# sero_rubella = np.append(sero_rubella,(sero_rubella[-2]+sero_rubella[-1])/2 + deviation)
-
-# age = np.append(age,85)
-# sero_measles = np.append(sero_measles,sero_measles[-1])
-# sero_mumps = np.append(sero_mumps,sero_mumps[-1])
-# sero_rubella = np.append(sero_rubella,sero_rubella[-1])
-
-# age = np.append(age,95)
-# sero_measles = np.append(sero_measles,sero_measles[-1])
-# sero_mumps = np.append(sero_mumps,sero_mumps[-1])
-# sero_rubella = np.append(sero_rubella,sero_rubella[-1])
-
-# age = np.append(age,105)
-# sero_measles = np.append(sero_measles,sero_measles[-1])
-# sero_mumps = np.append(sero_mumps,sero_mumps[-1])
-# sero_rubella = np.append(sero_rubella,sero_rubella[-1])
+sero_rubella[15] = sero_rubella[15] - deviation
+sero_rubella[20] = sero_rubella[20] - deviation
+sero_rubella[25] = sero_rubella[25] - deviation
+sero_rubella[28] = sero_rubella[28] - deviation
 
 age_midpoint = np.empty(samples)
 age_midpoint[:-1] = (age[:-1] + age[1:]) / 2
