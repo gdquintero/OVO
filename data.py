@@ -39,22 +39,22 @@ sero_rubella = np.array([
 samples = len(age)
 
 # Adding outliers manually
-deviation = 0.5
+deviation = 0.0
 
-sero_measles[15] = sero_measles[15] - deviation
-sero_measles[20] = sero_measles[20] - deviation
-sero_measles[25] = sero_measles[25] - deviation
-sero_measles[28] = sero_measles[28] - deviation
+sero_measles[20] = deviation
+sero_measles[21] = deviation
+sero_measles[22] = deviation
+sero_measles[23] = deviation
 
-sero_mumps[15] = sero_mumps[15] - deviation
-sero_mumps[20] = sero_mumps[20] - deviation
-sero_mumps[25] = sero_mumps[25] - deviation
-sero_mumps[28] = sero_mumps[28] - deviation
+sero_mumps[20] = deviation
+sero_mumps[21] = deviation
+sero_mumps[22] = deviation
+sero_mumps[23] = deviation
 
-sero_rubella[15] = sero_rubella[15] - deviation
-sero_rubella[20] = sero_rubella[20] - deviation
-sero_rubella[25] = sero_rubella[25] - deviation
-sero_rubella[28] = sero_rubella[28] - deviation
+sero_rubella[20] = deviation
+sero_rubella[21] = deviation
+sero_rubella[22] = deviation
+sero_rubella[23] = deviation
 
 age_midpoint = np.empty(samples)
 age_midpoint[:-1] = (age[:-1] + age[1:]) / 2
@@ -65,11 +65,6 @@ with open("output/seropositives.txt","w") as f:
     for i in range(samples):
         f.write("%i %f %f %f %f\n" % (age[i],sero_measles[i],sero_mumps[i],sero_rubella[i],age_midpoint[i]))
 
-
-# # Solucion exacta (del paper farrington)
-# sol_measles = np.array([0.197,0.287,0.021])
-# sol_mumps   = np.array([0.156,0.250,0.0])
-# sol_rubella = np.array([0.0628,0.178,0.020])
 
 plot_seropositive("measles",age,sero_measles)
 plot_seropositive("mumps",age,sero_mumps)

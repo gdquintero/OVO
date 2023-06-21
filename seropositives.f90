@@ -83,9 +83,7 @@ Program main
     t(:) = data(1,:)
     ! t(:) = data(5,:)
 
-    ! call single_test(4,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
-
-    call mixed_test(1,5,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
+    call mixed_test(1,4,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
 
     CONTAINS
 
@@ -97,14 +95,15 @@ Program main
         integer,        intent(inout) :: Idelta(samples),outliers(3*samples),m
         real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),y(samples)
 
-        integer :: noutliers,q,iterations
+        integer :: noutliers,q,iterations,i
         real(kind=8) :: fovo
 
         print*
         Print*, "OVO Algorithm for Measles"
         y(:) = data(2,:)
 
-        xk(:) = (/0.197d0,0.287d0,0.021d0/)
+        ! xk(:) = (/0.197d0,0.287d0,0.021d0/)
+        xk(:) = 1.0d-1
 
         do noutliers = out_inf,out_sup
             q = samples - noutliers
@@ -126,7 +125,9 @@ Program main
         print*
         Print*, "OVO Algorithm for Mumps"
         y(:) = data(3,:)
-        xk(:) = (/0.156d0,0.250d0,0.0d0/)
+
+        ! xk(:) = (/0.156d0,0.250d0,0.0d0/)
+        xk(:) = 1.0d-1
 
         do noutliers = out_inf,out_sup
             q = samples - noutliers
@@ -147,7 +148,9 @@ Program main
         print*
         Print*, "OVO Algorithm for Rubella"
         y(:) = data(4,:)
-        xk(:) = (/0.0628d0,0.178d0,0.020d0/)
+
+        ! xk(:) = (/0.0628d0,0.178d0,0.020d0/)
+        xk(:) = 1.0d-1
 
         do noutliers = out_inf,out_sup
             q = samples - noutliers
@@ -184,54 +187,6 @@ Program main
         
     end subroutine mixed_test
 
-    subroutine single_test(noutliers,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
-        implicit none
-
-        integer,        intent(in) :: samples,n,noutliers
-        real(kind=8),   intent(in) :: t(samples)
-        integer,        intent(inout) :: Idelta(samples),outliers(3*samples),m
-        real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),y(samples)
-
-        integer :: q, iterations
-        real(kind=8) :: fovo
-
-        solutions(:,:) = 0.0d0
-        q = samples - noutliers
-
-        ! Measles
-        print*
-        Print*, "OVO Algorithm for Measles"
-        y(:) = data(2,:)
-        ! xk(:) = (/0.197d0,0.287d0,0.021d0/)
-        xk = 1.0d-1
-        call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(1:noutliers),fovo,iterations)
-        ! print*,"Solution measles: ",xk
-        solutions(1,:) = xk(:)
-    
-        ! Mumps
-        print*
-        Print*, "OVO Algorithm for Mumps"
-        y(:) = data(3,:)
-        ! xk(:) = (/0.156d0,0.250d0,0.0d0/)
-        xk = 1.0d-1
-        call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(noutliers+1:2*noutliers),fovo,iterations)
-        ! print*,"Solution mumps: ",xk
-        solutions(2,:) = xk(:)
-    
-        ! Rubella
-        print*
-        Print*, "OVO Algorithm for Rubella"
-        y(:) = data(4,:)
-        ! xk(:) = (/0.0628d0,0.178d0,0.020d0/)
-        xk = 1.0d-1
-        call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial,outliers(2*noutliers+1:3*noutliers),fovo,iterations)
-        ! print*,"Solution rubella: ",xk
-        solutions(3,:) = xk(:)
-
-        call export(solutions,outliers,noutliers)
-
-    end subroutine single_test
-
     !==============================================================================
     ! MAIN ALGORITHM
     !==============================================================================
@@ -252,7 +207,7 @@ Program main
         epsilon = 1.0d-3
         delta   = 1.0d-4
         sigmin  = 1.0d0
-        gamma   = 5.0d0
+        gamma   = 2.0d0
         iter    = 0
         ! xk(:)   = 0.1d0
         indices(:) = (/(i, i = 1, samples)/)
@@ -395,33 +350,6 @@ Program main
         iterations = iter
         
     end subroutine ovo_algorithm
-
-    !==============================================================================
-    ! 
-    !==============================================================================
-    subroutine quadatic_error(x,n,samples,outliers,noutliers,t,y,res)
-        implicit none 
-
-        integer,        intent(in) :: n,noutliers,samples,outliers(noutliers)
-        real(kind=8),   intent(in) :: t(samples),y(samples),x(n-1)
-        real(kind=8),   intent(out) :: res
-
-        integer :: i
-        real(kind=8) :: aux
-
-        res = 0.0d0
-
-        do i = 1,samples
-            if (ANY(outliers .ne. i)) then
-                call model(x,i,n,t,samples,aux)
-                aux = aux - y(i)
-                res = res + aux**2
-            endif
-        enddo
-
-        res = res / samples
-
-    end subroutine quadatic_error
 
     !==============================================================================
     ! EXPORT RESULT TO PLOT
