@@ -53,8 +53,6 @@ for i in range(noutliers):
     rubella_outliers[0,i] = df_seropositives[0].values[outliers[2*noutliers+i]-1]
     rubella_outliers[1,i] = df_seropositives[3].values[outliers[2*noutliers+i]-1]
 
-print(outliers)
-print(measles_outliers[0,:])
 
 
 # Plotamos las soluciones 1:Measles, 2:Mumps, 3:Rubella

@@ -83,9 +83,9 @@ Program main
     t(:) = data(1,:)
     ! t(:) = data(5,:)
 
-    call mixed_test(4,4,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
+    call mixed_test(8,8,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
     
-    call export(xtrial,outliers,4)
+    call export(xtrial,outliers,8)
 
     CONTAINS
 
@@ -114,8 +114,8 @@ Program main
 
             ind = 1
             delta = 1.0d-3
-            sigmin = 1.0d0
-            gamma = 2.0d0
+            sigmin = 1.0d-1
+            gamma = 5.0d0
         
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial, &
             delta,sigmin,gamma,outliers(ind:ind+noutliers-1),fovo,iterations)
@@ -141,7 +141,12 @@ Program main
             write(*,1100) "Number of outliers: ",noutliers
             xk(:) = 1.0d-1
             ! xk(:) = (/0.156d0,0.250d0,0.0d0/)
+
             ind = ind + noutliers
+            delta = 1.0d-4
+            sigmin = 1.0d-1
+            gamma = 5.0d0
+
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial, &
             delta,sigmin,gamma,outliers(ind:ind+noutliers-1),fovo,iterations)
 
@@ -164,7 +169,12 @@ Program main
             write(*,1100) "Number of outliers: ",noutliers
             xk(:) = 1.0d-1
             ! xk(:) = (/0.0628d0,0.178d0,0.020d0/)
+
             ind = ind + noutliers
+            delta = 1.0d-3
+            sigmin = 1.0d0
+            gamma = 2.0d0
+
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial, &
             delta,sigmin,gamma,outliers(ind:ind+noutliers-1),fovo,iterations)
 
@@ -214,7 +224,7 @@ Program main
         real(kind=8)        :: gaux1,gaux2,a,b,c,ebt,terminate,alpha,epsilon
 
         alpha   = 0.5d0
-        epsilon = 1.0d-3
+        epsilon = 1.0d-7
         iter    = 0 
         
         indices(:) = (/(i, i = 1, samples)/)
