@@ -83,9 +83,9 @@ Program main
     t(:) = data(1,:)
     ! t(:) = data(5,:)
 
-    call mixed_test(8,8,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
+    call mixed_test(1,8,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
     
-    call export(xtrial,outliers,8)
+    ! call export(xtrial,outliers,8)
 
     CONTAINS
 
