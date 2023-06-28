@@ -31,8 +31,8 @@ sup = int(lim[1])
 n = sup - inf + 1
 t = np.linspace(0,70,1000)
 
-plot_mixed(1,t,inf,df_seropositives,df_mixed_measles)
+# plot_mixed(1,t,inf,df_seropositives,df_mixed_measles)
 plot_mixed(2,t,inf,df_seropositives,df_mixed_mumps)
-plot_mixed(3,t,inf,df_seropositives,df_mixed_rubella)
+# plot_mixed(3,t,inf,df_seropositives,df_mixed_rubella)
 
 

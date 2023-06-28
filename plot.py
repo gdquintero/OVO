@@ -58,7 +58,7 @@ for i in range(noutliers):
 # Plotamos las soluciones 1:Measles, 2:Mumps, 3:Rubella
 plot_solutions(1,df_seropositives,df_mixed_measles,measles_outliers,noutliers)
 plot_solutions(2,df_seropositives,df_mixed_mumps,mumps_outliers,noutliers)
-plot_solutions(3,df_seropositives,df_mixed_rubella,rubella_outliers,noutliers)
+# plot_solutions(3,df_seropositives,df_mixed_rubella,rubella_outliers,noutliers)
 
 
 
