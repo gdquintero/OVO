@@ -83,6 +83,6 @@ program table
                                      '&',data(i,6),'&',int(data(i,7)),'\\'
     enddo
 
-    40 format (I4,1X,A1,1X,ES9.3,1X,A1,1X,I4,1X,A1,1X,ES9.3,1X,A1,1X,I4,1X,A1,1X,ES9.3,1X,A1,1X,I4,1X,A2)
+    40 format (I5,1X,A1,1X,ES9.3,1X,A1,1X,I5,1X,A1,1X,ES9.3,1X,A1,1X,I5,1X,A1,1X,ES9.3,1X,A1,1X,I4,1X,A2)
 
 end program

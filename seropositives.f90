@@ -81,8 +81,8 @@ Program main
     ! Number of days
     t(:) = data(1,:)
     ! t(:) = data(5,:)
-    inf = 2
-    sup = 9
+    inf = 1
+    sup = 10
 
     allocate(outliers(3*samples*(sup-inf+1)),stat=allocerr)
 
@@ -124,7 +124,7 @@ Program main
             ! xk(:) = (/0.197d0,0.287d0,0.021d0/)
 
             ind = 1
-            delta = 1.0d-3
+            delta = 5.0d-4
             sigmin = 1.0d-1
             gamma = 5.0d0
         
@@ -154,9 +154,9 @@ Program main
             ! xk(:) = (/0.156d0,0.250d0,0.0d0/)
 
             ind = ind + noutliers
-            delta = 5.0d-3
+            ! delta = 5.0d-4
             ! sigmin = 1.0d-1
-            ! gamma = 2.0d0
+            ! gamma = 5.0d0
 
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial, &
             delta,sigmin,gamma,outliers(ind:ind+noutliers-1),fovo,iterations)
@@ -170,35 +170,35 @@ Program main
             write(410,*) iterations
         enddo
 
-        ! print*
-        ! Print*, "OVO Algorithm for Rubella"
-        ! y(:) = data(4,:)
+        print*
+        Print*, "OVO Algorithm for Rubella"
+        y(:) = data(4,:)
 
-        ! do noutliers = out_inf,out_sup
-        !     q = samples - noutliers
-        !     print*
-        !     write(*,1100) "Number of outliers: ",noutliers
-        !     xk(:) = 1.0d-1
-        !     ! xk(:) = (/0.0628d0,0.178d0,0.020d0/)
+        do noutliers = out_inf,out_sup
+            q = samples - noutliers
+            print*
+            write(*,1100) "Number of outliers: ",noutliers
+            xk(:) = 1.0d-1
+            ! xk(:) = (/0.0628d0,0.178d0,0.020d0/)
 
-        !     ind = ind + noutliers
+            ind = ind + noutliers
 
-        !     delta = 5.0d-4
-        !     ! sigmin = 1.0d0
-        !     ! gamma = 2.0d0
+            ! delta = 1.0d-3
+            ! sigmin = 1.0d-1
+            ! gamma = 2.0d0
 
-        !     call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial, &
-        !     delta,sigmin,gamma,outliers(ind:ind+noutliers-1),fovo,iterations)
+            call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial, &
+            delta,sigmin,gamma,outliers(ind:ind+noutliers-1),fovo,iterations)
 
-        !     Open(Unit = 120, File = "output/solutions_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
-        !     Open(Unit = 320, File = "output/fobj_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
-        !     Open(Unit = 420, File = "output/iterations_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
+            Open(Unit = 120, File = "output/solutions_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
+            Open(Unit = 320, File = "output/fobj_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
+            Open(Unit = 420, File = "output/iterations_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
 
-        !     write(120,1000) xtrial(1), xtrial(2), xtrial(3)
-        !     write(320,*) fovo
-        !     write(420,*) iterations
+            write(120,1000) xtrial(1), xtrial(2), xtrial(3)
+            write(320,*) fovo
+            write(420,*) iterations
     
-        ! enddo
+        enddo
 
         
 
@@ -233,12 +233,12 @@ Program main
         real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),fovo
         integer,        intent(inout) :: outliers(noutliers),iterations
 
-        integer, parameter  :: max_iter = 1000, max_iter_sub = 100, kflag = 2
+        integer, parameter  :: max_iter = 10000, max_iter_sub = 100, kflag = 2
         integer             :: iter,iter_sub,i,j
         real(kind=8)        :: gaux1,gaux2,a,b,c,ebt,terminate,alpha,epsilon
 
         alpha   = 0.5d0
-        epsilon = 1.0d-7
+        epsilon = 1.0d-4
         iter    = 0 
         
         indices(:) = (/(i, i = 1, samples)/)
@@ -359,8 +359,8 @@ Program main
             enddo
     
             opt_cond(:) = opt_cond(:) + nu_u(:) - nu_l(:)
-            ! terminate = norm2(opt_cond)
-            terminate = norm2(xk-xtrial)
+            terminate = norm2(opt_cond)
+            ! terminate = norm2(xk-xtrial)
 
             write(*,30)  iter,iter_sub,fxtrial,terminate,m,xtrial
             30 format (2X,I6,10X,I4,6X,ES14.6,4X,ES14.6,6X,I2,1X,3F10.3)
@@ -369,7 +369,7 @@ Program main
             fxk = fxtrial
             xk(1:n-1) = xtrial(1:n-1)
 
-            if (terminate .lt. epsilon) exit
+            if (terminate .le. epsilon) exit
             if (iter .ge. max_iter) exit
     
             call mount_Idelta(faux,delta,q,indices,samples,Idelta,m)
