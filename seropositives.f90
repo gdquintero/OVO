@@ -34,8 +34,7 @@ Program main
     n = 4
 
     allocate(t(samples),y(samples),x(n),xk(n-1),xtrial(n-1),l(n),u(n),xstar(n-1),data(5,samples),&
-    faux(samples),indices(samples),Idelta(samples),nu_l(n-1),nu_u(n-1),opt_cond(n-1),&
-    outliers(3*samples),stat=allocerr)
+    faux(samples),indices(samples),Idelta(samples),nu_l(n-1),nu_u(n-1),opt_cond(n-1),stat=allocerr)
 
     if ( allocerr .ne. 0 ) then
         write(*,*) 'Allocation error in main program'
@@ -85,6 +84,13 @@ Program main
     inf = 2
     sup = 9
 
+    allocate(outliers(3*samples*(sup-inf+1)),stat=allocerr)
+
+    if ( allocerr .ne. 0 ) then
+        write(*,*) 'Allocation error in main program'
+        stop
+    end if
+
     call mixed_test(inf,sup,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
     
     ! call export(xtrial,outliers,sup)
@@ -96,7 +102,7 @@ Program main
 
         integer,        intent(in) :: samples,n,out_inf,out_sup
         real(kind=8),   intent(in) :: t(samples)
-        integer,        intent(inout) :: Idelta(samples),outliers(3*samples*(sup-inf)),m
+        integer,        intent(inout) :: Idelta(samples),outliers(3*samples*(sup-inf+1)),m
         real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),y(samples)
 
         integer :: noutliers,q,iterations,ind
@@ -115,7 +121,7 @@ Program main
             ! xk(:) = (/0.197d0,0.287d0,0.021d0/)
 
             ind = 1
-            delta = 1.0d-3
+            delta = 5.0d-4
             sigmin = 1.0d-1
             gamma = 5.0d0
         
@@ -174,7 +180,7 @@ Program main
 
             ind = ind + noutliers
 
-            delta = 1.0d-3
+            delta = 5.0d-4
             ! sigmin = 1.0d0
             ! gamma = 2.0d0
 
