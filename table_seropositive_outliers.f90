@@ -33,17 +33,17 @@ program table
     open(UNIT = 420, FILE = "output/iterations_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
     open(UNIT = 500, FILE = "output/num_mixed_test.txt", ACCESS = "SEQUENTIAL")
 
-    do i = 1,16
-        if (i .ne. 16) then
+    do i = 1,14
+        if (i .ne. 14) then
             write(100,10) '$[',age(i),',',age(i+1),')$','&',measles(i),'&',mumps(i),'&',rubella(i),'&',&
-                          '$[',age(i+17),',',age(i+18),')$','&',measles(i+16),'&',mumps(i+16),'&',rubella(i+16),'\\'
+                          '$[',age(i+15),',',age(i+16),')$','&',measles(i+15),'&',mumps(i+15),'&',rubella(i+15),'\\'
         else
             write(100,20) '$[',age(i),',',age(i+1),')$','&',measles(i),'&',mumps(i),'&',rubella(i),'&',&
-                          '$[',age(33),',+\infty)$','&',measles(33),'&',mumps(33),'&',rubella(33),'\\'
+                          '$[',age(29),',+\infty)$','&',measles(29),'&',mumps(29),'&',rubella(29),'\\'
         end if
     end do
 
-    write(100,30) '$[',age(17),',',age(18),')$','&',measles(17),'&',mumps(17),'&',rubella(17),'&','&','&','\\'
+    write(100,30) '$[',age(15),',',age(16),')$','&',measles(15),'&',mumps(15),'&',rubella(15),'&','&','&','\\'
 
     10 format (A2,I2,A1,I2,A2,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,&
                A2,I2,A1,I2,A2,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A1,1X,F5.3,1X,A2)
@@ -66,7 +66,7 @@ program table
     end if
 
     do i = 1, n
-        data(i,1) = 33 - i
+        data(i,1) = 30 - inf - i
         read(200,*) data(i,2)
         read(400,*) data(i,3)
         read(210,*) data(i,4)
@@ -74,6 +74,8 @@ program table
         read(220,*) data(i,6)
         read(420,*) data(i,7)
     enddo
+
+    
 
     do i = 1, n
         write(110,40) int(data(i,1)),'&',data(i,2),'&',int(data(i,3)),&
