@@ -81,8 +81,8 @@ Program main
     ! Number of days
     t(:) = data(1,:)
     ! t(:) = data(5,:)
-    inf = 1
-    sup = 10
+    inf = 8
+    sup = 8
 
     allocate(outliers(3*samples*(sup-inf+1)),stat=allocerr)
 

@@ -8,7 +8,7 @@ import models
 def plot_solutions(ind,df_seropositives,df_sol,sero_outliers,noutliers):
     t = np.linspace(0,70,1000)
     disease = ["Measles","Mumps","Rubella"]
-    plt.plot(df_seropositives[0].values,df_seropositives[ind].values,"o")
+    plt.plot(df_seropositives[0].values,df_seropositives[ind].values,"ko")
     plt.plot(t,models.F(t,*df_sol.iloc[0].values),label="OVO")
     plt.plot(sero_outliers[0],sero_outliers[1],'ro',mfc='none',ms=10)
 
@@ -21,6 +21,7 @@ def plot_solutions(ind,df_seropositives,df_sol,sero_outliers,noutliers):
 
     plt.legend()
     plt.title(disease[ind-1])
+    plt.savefig(disease[ind-1]+".pdf",bbox_inches = "tight")
     plt.show()
 
 df_seropositives = pd.read_table("output/seropositives.txt",delimiter=" ",header=None,skiprows=1)
