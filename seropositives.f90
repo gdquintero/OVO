@@ -3,7 +3,7 @@ Program main
 
     implicit none 
     
-    integer :: allocerr,samples
+    integer :: allocerr,samples,inf,sup
     real(kind=8) :: fxk,fxtrial,ti,sigma
     real(kind=8), allocatable :: xtrial(:),faux(:),indices(:),nu_l(:),nu_u(:),opt_cond(:),&
                                  xstar(:),y(:),data(:,:),t(:)
@@ -82,10 +82,12 @@ Program main
     ! Number of days
     t(:) = data(1,:)
     ! t(:) = data(5,:)
+    inf = 6
+    sup = 6
 
-    call mixed_test(3,3,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
+    call mixed_test(inf,sup,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
     
-    call export(xtrial,outliers,3)
+    call export(xtrial,outliers,sup)
 
     CONTAINS
 
@@ -109,8 +111,8 @@ Program main
 
             print*
             write(*,1100) "Number of outliers: ",noutliers
-            ! xk(:) = 1.0d-1
-            xk(:) = (/0.197d0,0.287d0,0.021d0/)
+            xk(:) = 1.0d-1
+            ! xk(:) = (/0.197d0,0.287d0,0.021d0/)
 
             ind = 1
             delta = 1.0d-3
@@ -131,62 +133,62 @@ Program main
             
         enddo
 
-        print*
-        Print*, "OVO Algorithm for Mumps"
-        y(:) = data(3,:)
+        ! print*
+        ! Print*, "OVO Algorithm for Mumps"
+        ! y(:) = data(3,:)
 
-        do noutliers = out_inf,out_sup
-            q = samples - noutliers
-            print*
-            write(*,1100) "Number of outliers: ",noutliers
-            ! xk(:) = 1.0d-1
-            xk(:) = (/0.156d0,0.250d0,0.0d0/)
+        ! do noutliers = out_inf,out_sup
+        !     q = samples - noutliers
+        !     print*
+        !     write(*,1100) "Number of outliers: ",noutliers
+        !     ! xk(:) = 1.0d-1
+        !     xk(:) = (/0.156d0,0.250d0,0.0d0/)
 
-            ind = ind + noutliers
-            delta = 1.0d-4
-            sigmin = 1.0d-1
-            gamma = 5.0d0
+        !     ind = ind + noutliers
+        !     delta = 1.0d-4
+        !     sigmin = 1.0d-1
+        !     gamma = 5.0d0
 
-            call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial, &
-            delta,sigmin,gamma,outliers(ind:ind+noutliers-1),fovo,iterations)
+        !     call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial, &
+        !     delta,sigmin,gamma,outliers(ind:ind+noutliers-1),fovo,iterations)
 
-            Open(Unit = 110, File = "output/solutions_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
-            Open(Unit = 310, File = "output/fobj_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
-            Open(Unit = 410, File = "output/iterations_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
+        !     Open(Unit = 110, File = "output/solutions_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
+        !     Open(Unit = 310, File = "output/fobj_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
+        !     Open(Unit = 410, File = "output/iterations_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
 
-            write(110,1000) xtrial(1), xtrial(2), xtrial(3)
-            write(310,*) fovo
-            write(410,*) iterations
-        enddo
+        !     write(110,1000) xtrial(1), xtrial(2), xtrial(3)
+        !     write(310,*) fovo
+        !     write(410,*) iterations
+        ! enddo
 
-        print*
-        Print*, "OVO Algorithm for Rubella"
-        y(:) = data(4,:)
+        ! print*
+        ! Print*, "OVO Algorithm for Rubella"
+        ! y(:) = data(4,:)
 
-        do noutliers = out_inf,out_sup
-            q = samples - noutliers
-            print*
-            write(*,1100) "Number of outliers: ",noutliers
-            ! xk(:) = 1.0d-1
-            xk(:) = (/0.0628d0,0.178d0,0.020d0/)
+        ! do noutliers = out_inf,out_sup
+        !     q = samples - noutliers
+        !     print*
+        !     write(*,1100) "Number of outliers: ",noutliers
+        !     ! xk(:) = 1.0d-1
+        !     xk(:) = (/0.0628d0,0.178d0,0.020d0/)
 
-            ind = ind + noutliers
-            delta = 1.0d-3
-            sigmin = 1.0d0
-            gamma = 2.0d0
+        !     ind = ind + noutliers
+        !     delta = 1.0d-3
+        !     sigmin = 1.0d0
+        !     gamma = 2.0d0
 
-            call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial, &
-            delta,sigmin,gamma,outliers(ind:ind+noutliers-1),fovo,iterations)
+        !     call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial, &
+        !     delta,sigmin,gamma,outliers(ind:ind+noutliers-1),fovo,iterations)
 
-            Open(Unit = 120, File = "output/solutions_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
-            Open(Unit = 320, File = "output/fobj_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
-            Open(Unit = 420, File = "output/iterations_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
+        !     Open(Unit = 120, File = "output/solutions_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
+        !     Open(Unit = 320, File = "output/fobj_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
+        !     Open(Unit = 420, File = "output/iterations_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
 
-            write(120,1000) xtrial(1), xtrial(2), xtrial(3)
-            write(320,*) fovo
-            write(420,*) iterations
+        !     write(120,1000) xtrial(1), xtrial(2), xtrial(3)
+        !     write(320,*) fovo
+        !     write(420,*) iterations
     
-        enddo
+        ! enddo
 
         Open(Unit = 500, File = "output/num_mixed_test.txt", ACCESS = "SEQUENTIAL")
         write(500,1200) out_inf
@@ -224,7 +226,7 @@ Program main
         real(kind=8)        :: gaux1,gaux2,a,b,c,ebt,terminate,alpha,epsilon
 
         alpha   = 0.5d0
-        epsilon = 1.0d-7
+        epsilon = 1.0d-3
         iter    = 0 
         
         indices(:) = (/(i, i = 1, samples)/)
@@ -242,13 +244,13 @@ Program main
 
         call mount_Idelta(faux,delta,q,indices,samples,Idelta,m)
 
-        print*,"-------------------------------------------------------------------"
-        write(*,10) "Iterations","Inter. Iter.","Objective func.","Optimality cond.","Idelta"
-        10 format (A11,2X,A12,2X,A15,2X,A16,2X,A6)
-        print*,"-------------------------------------------------------------------"
+        print*,"--------------------------------------------------------------------------------------------------"
+        write(*,10) "Iterations","Inter. Iter.","Objective func.","Optimality cond.","Idelta","x_1","x_2","x_3"
+        10 format (2X,A11,2X,A12,2X,A15,2X,A16,2X,A6,5X,A3,7X,A3,7X,A3)
+        print*,"--------------------------------------------------------------------------------------------------"
 
-        write(*,20)  0,"-",fxk,"-",m
-        20 format (5X,I1,13X,A1,6X,ES14.6,12X,A1,11X,I2)
+        write(*,20)  0,"-",fxk,"-",m,xk
+        20 format (7X,I1,13X,A1,6X,ES14.6,12X,A1,11X,I2,1X,3F10.3)
 
         do
             iter = iter + 1
@@ -345,10 +347,11 @@ Program main
             enddo
     
             opt_cond(:) = opt_cond(:) + nu_u(:) - nu_l(:)
-            terminate = norm2(opt_cond)
+            ! terminate = norm2(opt_cond)
+            terminate = norm2(xk-xtrial)
 
-            write(*,30)  iter,iter_sub,fxtrial,terminate,m
-            30 format (2X,I4,10X,I4,6X,ES14.6,4X,ES14.6,6X,I2)
+            write(*,30)  iter,iter_sub,fxtrial,terminate,m,xtrial
+            30 format (2X,I6,10X,I4,6X,ES14.6,4X,ES14.6,6X,I2,1X,3F10.3)
 
             deallocate(lambda,equatn,linear,grad)
             fxk = fxtrial
@@ -360,7 +363,7 @@ Program main
             call mount_Idelta(faux,delta,q,indices,samples,Idelta,m)
             
         end do ! End of Main Algorithm
-        print*,"-------------------------------------------------------------------"
+        print*,"--------------------------------------------------------------------------------------------------"
 
         outliers(:) = int(indices(samples - noutliers + 1:))
         fovo = fxk

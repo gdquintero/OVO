@@ -21,7 +21,8 @@ def plot_solutions(ind,df_seropositives,df_sol,sero_outliers,noutliers):
 
     plt.legend()
     plt.title(disease[ind-1])
-    plt.show()
+
+    plt.savefig(disease[ind-1]+".pdf",bbox_inches = "tight")
 
 df_seropositives = pd.read_table("output/seropositives.txt",delimiter=" ",header=None,skiprows=1)
 df_mixed_measles = pd.read_table("output/solutions_mixed_measles.txt",delimiter=" ",header=None,skiprows=0)
@@ -57,8 +58,8 @@ for i in range(noutliers):
 
 # Plotamos las soluciones 1:Measles, 2:Mumps, 3:Rubella
 plot_solutions(1,df_seropositives,df_mixed_measles,measles_outliers,noutliers)
-plot_solutions(2,df_seropositives,df_mixed_mumps,mumps_outliers,noutliers)
-plot_solutions(3,df_seropositives,df_mixed_rubella,rubella_outliers,noutliers)
+# plot_solutions(2,df_seropositives,df_mixed_mumps,mumps_outliers,noutliers)
+# plot_solutions(3,df_seropositives,df_mixed_rubella,rubella_outliers,noutliers)
 
 
 
