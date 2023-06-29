@@ -16,8 +16,8 @@ def plot_solutions(ind,df_seropositives,df_sol_ovo1,df_sol_ovo2,df_sol_ls):
 
     plt.legend()
     plt.title(disease[ind-1])
-    plt.savefig(disease[ind-1]+".pdf",bbox_inches = "tight")
-    # plt.show()
+    # plt.savefig(disease[ind-1]+".pdf",bbox_inches = "tight")
+    plt.show()
     plt.close()
 
 df_seropositives = pd.read_table("output/seropositives.txt",delimiter=" ",header=None,skiprows=1)
