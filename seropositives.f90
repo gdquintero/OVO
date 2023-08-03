@@ -81,8 +81,8 @@ Program main
     ! Number of days
     t(:) = data(1,:) ! Initial point
     ! t(:) = data(5,:) ! Midpoint
-    inf = 4
-    sup = 4
+    inf = 1
+    sup = 10
 
     allocate(outliers(3*samples*(sup-inf+1)),stat=allocerr)
 
@@ -114,7 +114,7 @@ Program main
         print*
         Print*, "OVO Algorithm for Measles"
         y(:) = data(2,:)
-        xk(:) = 1.0d-1
+        ! xk(:) = 1.0d-1
 
         do noutliers = out_inf,out_sup
             q = samples - noutliers
@@ -122,7 +122,7 @@ Program main
             print*
             write(*,1100) "Number of outliers: ",noutliers
             ! xk(:) = 1.0d-1
-            ! xk(:) = (/0.197d0,0.287d0,0.021d0/)
+            xk(:) = (/0.197d0,0.287d0,0.021d0/)
 
             ind = 1
             delta = 5.0d-4
@@ -154,7 +154,7 @@ Program main
             print*
             write(*,1100) "Number of outliers: ",noutliers
             ! xk(:) = 1.0d-1
-            ! xk(:) = (/0.156d0,0.250d0,0.0d0/)
+            xk(:) = (/0.156d0,0.250d0,0.0d0/)
 
             ind = ind + noutliers
             ! delta = 5.0d-4
@@ -184,7 +184,7 @@ Program main
             print*
             write(*,1100) "Number of outliers: ",noutliers
             ! xk(:) = 1.0d-1
-            ! xk(:) = (/0.0628d0,0.178d0,0.020d0/)
+            xk(:) = (/0.0628d0,0.178d0,0.020d0/)
 
             ind = ind + noutliers
 

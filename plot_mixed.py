@@ -4,12 +4,18 @@ import matplotlib.pyplot as plt
 import models
 
 def plot_mixed(ind,t,inf,df_seropositives,df_mixed):
-    disease = ["Measles","Mumps","Rubella"]
-
+    disease = [r"Measles",r"Mumps",r"Rubella"]
+    plt.rcParams.update({'font.size': 14})
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
+    plt.figure(figsize=(12,5))
+    # plt.xticks(fontsize=20)
+    # plt.yticks(fontsize=20)
     plt.plot(df_seropositives[0].values,df_seropositives[ind].values,"ko")
 
     for i in range(n):
-        plt.plot(t,models.F(t,*df_mixed.iloc[i].values),label="Outliers: "+str(inf+i))
+        plt.plot(t,models.F(t,*df_mixed.iloc[i].values),label="Outliers: "+str(inf+i),linewidth=2)
+        # plt.title(disease[ind-1],fontsize = 20)
         plt.title(disease[ind-1])
         plt.legend()
 
