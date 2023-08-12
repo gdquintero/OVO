@@ -3,10 +3,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 def plot_seropositive(sero,x,y):
-    # plt.ylim([0,1.1])
     # t = np.linspace(0,70,1000)
-
-    plt.plot(x,y,"o",ls=":")
+    plt.rcParams.update({'font.size': 14})
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
+    plt.ylim([0,1.05])
+    plt.plot(x,y,"ko",ls=":")
 
     if sero == "measles":
         plt.savefig("sero_measles.pdf",bbox_inches = "tight") 
@@ -41,10 +43,6 @@ samples = len(age)
 # Adding outliers manually
 deviation = 0.5
 
-print(age[16],age[17])
-print(age[17],age[18])
-print(age[18],age[19])
-print(age[19],age[20])
 
 sero_measles[16] = deviation
 sero_measles[17] = deviation
@@ -71,6 +69,6 @@ with open("output/seropositives.txt","w") as f:
         f.write("%i %f %f %f %f\n" % (age[i],sero_measles[i],sero_mumps[i],sero_rubella[i],age_midpoint[i]))
 
 
-# plot_seropositive("measles",age,sero_measles)
-# plot_seropositive("mumps",age,sero_mumps)
-# plot_seropositive("rubella",age,sero_rubella)
+plot_seropositive("measles",age,sero_measles)
+plot_seropositive("mumps",age,sero_mumps)
+plot_seropositive("rubella",age,sero_rubella)

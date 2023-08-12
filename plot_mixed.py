@@ -5,19 +5,23 @@ import models
 
 def plot_mixed(ind,t,inf,df_seropositives,df_mixed):
     disease = [r"Measles",r"Mumps",r"Rubella"]
-    plt.rcParams.update({'font.size': 14})
+    plt.rcParams.update({'font.size': 12})
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
-    plt.figure(figsize=(12,5))
-    # plt.xticks(fontsize=20)
-    # plt.yticks(fontsize=20)
-    plt.plot(df_seropositives[0].values,df_seropositives[ind].values,"ko")
+    # plt.figure(figsize=(10,7))
+    # plt.xticks(fontsize=18)
+    # plt.yticks(fontsize=18)
+    plt.ylim([0,1.05])
+    
 
     for i in range(n):
-        plt.plot(t,models.F(t,*df_mixed.iloc[i].values),label="Outliers: "+str(inf+i),linewidth=2)
-        # plt.title(disease[ind-1],fontsize = 20)
-        plt.title(disease[ind-1])
-        plt.legend()
+        plt.plot(t,models.F(t,*df_mixed.iloc[i].values),label="o = "+str(inf+i),linewidth=1.5)
+        # plt.title(disease[ind-1],fontsize = 18)
+        # plt.title(disease[ind-1])
+        plt.legend( loc='lower right')
+
+    l = plt.plot(df_seropositives[0].values,df_seropositives[ind].values,"ko")
+    plt.setp(l, 'markersize', 6)
 
     plt.savefig(disease[ind-1]+".pdf",bbox_inches = "tight")
     plt.show()

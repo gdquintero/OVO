@@ -81,7 +81,7 @@ Program main
     ! Number of days
     t(:) = data(1,:) ! Initial point
     ! t(:) = data(5,:) ! Midpoint
-    inf = 1
+    inf = 10
     sup = 10
 
     allocate(outliers(3*samples*(sup-inf+1)),stat=allocerr)
@@ -242,7 +242,7 @@ Program main
         integer             :: iter,iter_sub,i,j
         real(kind=8)        :: gaux1,gaux2,a,b,c,ebt,terminate,alpha,epsilon
 
-        alpha   = 0.5d0
+        alpha   = 1.0d-8
         epsilon = 1.0d-4
         iter    = 0 
         
@@ -261,13 +261,13 @@ Program main
 
         call mount_Idelta(faux,delta,q,indices,samples,Idelta,m)
 
-        print*,"--------------------------------------------------------------------------------------------------"
-        write(*,10) "Iterations","Inter. Iter.","Objective func.","Optimality cond.","Idelta","x_1","x_2","x_3"
-        10 format (2X,A11,2X,A12,2X,A15,2X,A16,2X,A6,5X,A3,7X,A3,7X,A3)
-        print*,"--------------------------------------------------------------------------------------------------"
+        print*,"-----------------------------------------------------------------------------"
+        write(*,10) "Iterations","Inter. Iter.","Objective func.","Optimality cond.","Idelta","Sum LM"
+        10 format (2X,A11,2X,A12,2X,A15,2X,A16,2X,A6,2X,A6)
+        print*,"-----------------------------------------------------------------------------"
 
-        write(*,20)  0,"-",fxk,"-",m,xk
-        20 format (7X,I1,13X,A1,6X,ES14.6,12X,A1,11X,I2,1X,3F10.3)
+        write(*,20)  0,"-",fxk,"-",m
+        20 format (7X,I1,13X,A1,6X,ES14.6,12X,A1,11X,I2,1X)
 
         do
             iter = iter + 1
@@ -367,8 +367,8 @@ Program main
             terminate = norm2(opt_cond)
             ! terminate = norm2(xk-xtrial)
 
-            write(*,30)  iter,iter_sub,fxtrial,terminate,m,xtrial
-            30 format (2X,I6,10X,I4,6X,ES14.6,4X,ES14.6,6X,I2,1X,3F10.3)
+            write(*,30)  iter,iter_sub,fxtrial,terminate,m,sum(lambda(:))
+            30 format (2X,I6,10X,I4,6X,ES14.6,4X,ES14.6,6X,I2,5X,F3.1)
 
             deallocate(lambda,equatn,linear,grad)
             fxk = fxtrial
@@ -380,7 +380,7 @@ Program main
             call mount_Idelta(faux,delta,q,indices,samples,Idelta,m)
             
         end do ! End of Main Algorithm
-        print*,"--------------------------------------------------------------------------------------------------"
+        print*,"-----------------------------------------------------------------------------"
 
         outliers(:) = int(indices(samples - noutliers + 1:))
         fovo = fxk

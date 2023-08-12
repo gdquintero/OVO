@@ -7,9 +7,14 @@ import models
 
 def plot_solutions(ind,df_seropositives,df_sol,sero_outliers,noutliers):
     t = np.linspace(0,70,1000)
-    disease = ["Measles","Mumps","Rubella"]
-    plt.plot(df_seropositives[0].values,df_seropositives[ind].values,"ko")
-    plt.plot(t,models.F(t,*df_sol.iloc[0].values),label="OVO")
+    disease = [r"Measles",r"Mumps",r"Rubella"]
+    plt.rcParams.update({'font.size': 12})
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
+    # plt.xticks(fontsize=18)
+    # plt.yticks(fontsize=18)
+    plt.ylim([0,1.05])
+    plt.plot(t,models.F(t,*df_sol.iloc[0].values))
     plt.plot(sero_outliers[0],sero_outliers[1],'ro',mfc='none',ms=10)
 
     for i in range(noutliers):
@@ -19,8 +24,9 @@ def plot_solutions(ind,df_seropositives,df_sol,sero_outliers,noutliers):
         y_values = [point1[1], point2[1]]
         plt.plot(x_values, y_values, 'k', linestyle="--")
 
-    plt.legend()
-    plt.title(disease[ind-1])
+    l = plt.plot(df_seropositives[0].values,df_seropositives[ind].values,"ko")
+    plt.setp(l, 'markersize', 6)
+    plt.title(disease[ind-1],fontsize = 18)
     plt.savefig(disease[ind-1]+".pdf",bbox_inches = "tight")
     plt.show()
 
