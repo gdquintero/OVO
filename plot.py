@@ -26,7 +26,7 @@ def plot_solutions(ind,df_seropositives,df_sol,sero_outliers,noutliers):
 
     l = plt.plot(df_seropositives[0].values,df_seropositives[ind].values,"ko")
     plt.setp(l, 'markersize', 6)
-    plt.title(disease[ind-1],fontsize = 18)
+    # plt.title(disease[ind-1],fontsize = 18)
     plt.savefig(disease[ind-1]+".pdf",bbox_inches = "tight")
     plt.show()
 
