@@ -3,8 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import models
 
-# 'ro',mfc='none',ms=10)
-
 def plot_solutions(ind,df_seropositives,df_sol,sero_outliers,noutliers):
     t = np.linspace(0,70,1000)
     disease = [r"Measles",r"Mumps",r"Rubella"]
