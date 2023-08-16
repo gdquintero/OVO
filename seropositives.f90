@@ -77,12 +77,11 @@ Program main
     l(1:n-1) = 0.0d0; l(n) = -1.0d+20
     u(1:n-1) = 1.0d+20; u(n) = 0.0d0
 
-
     ! Number of days
     t(:) = data(1,:) ! Initial point
     ! t(:) = data(5,:) ! Midpoint
-    inf = 10
-    sup = 10
+    inf = 4
+    sup = 4
 
     allocate(outliers(3*samples*(sup-inf+1)),stat=allocerr)
 
@@ -95,7 +94,6 @@ Program main
 
     call mixed_test(inf,sup,outliers,t,y,indices,Idelta,samples,m,n,xtrial)
 
-    
     call export(xtrial,outliers,sup)
 
     CONTAINS
@@ -121,8 +119,8 @@ Program main
 
             print*
             write(*,1100) "Number of outliers: ",noutliers
-            ! xk(:) = 1.0d-1
-            xk(:) = (/0.197d0,0.287d0,0.021d0/)
+            xk(:) = 1.0d-1
+            ! xk(:) = (/0.197d0,0.287d0,0.021d0/)
 
             ind = 1
             delta = 5.0d-4
@@ -153,8 +151,8 @@ Program main
             q = samples - noutliers
             print*
             write(*,1100) "Number of outliers: ",noutliers
-            ! xk(:) = 1.0d-1
-            xk(:) = (/0.156d0,0.250d0,0.0d0/)
+            xk(:) = 1.0d-1
+            ! xk(:) = (/0.156d0,0.250d0,0.0d0/)
 
             ind = ind + noutliers
             ! delta = 5.0d-4
@@ -183,8 +181,8 @@ Program main
             q = samples - noutliers
             print*
             write(*,1100) "Number of outliers: ",noutliers
-            ! xk(:) = 1.0d-1
-            xk(:) = (/0.0628d0,0.178d0,0.020d0/)
+            xk(:) = 1.0d-1
+            ! xk(:) = (/0.0628d0,0.178d0,0.020d0/)
 
             ind = ind + noutliers
 
@@ -204,9 +202,7 @@ Program main
             write(420,*) iterations
     
         enddo
-
         
-
         Open(Unit = 500, File = "output/num_mixed_test.txt", ACCESS = "SEQUENTIAL")
         write(500,1200) out_inf
         write(500,1200) out_sup
@@ -261,13 +257,13 @@ Program main
 
         call mount_Idelta(faux,delta,q,indices,samples,Idelta,m)
 
-        print*,"-----------------------------------------------------------------------------"
-        write(*,10) "Iterations","Inter. Iter.","Objective func.","Optimality cond.","Idelta","Sum LM"
-        10 format (2X,A11,2X,A12,2X,A15,2X,A16,2X,A6,2X,A6)
-        print*,"-----------------------------------------------------------------------------"
+        print*,"----------------------------------------------------------------------------------------------------"
+        write(*,10) "Iterations","Inter. Iter.","Objective func.","Optimality cond.","Idelta","Sum LM","x_1","x_2","x_3"
+        10 format (2X,A11,2X,A12,2X,A15,2X,A16,2X,A6,2X,A6,4X,A3,5X,A3,4X,A3)
+        print*,"----------------------------------------------------------------------------------------------------"
 
-        write(*,20)  0,"-",fxk,"-",m
-        20 format (7X,I1,13X,A1,6X,ES14.6,12X,A1,11X,I2,1X)
+        write(*,20)  0,"-",fxk,"-",m,"-",xk(1),xk(2),xk(3)
+        20 format (7X,I1,13X,A1,6X,ES14.6,12X,A1,11X,I2,6X,A1,6X,F4.2,4X,F4.2,4X,F4.2)
 
         do
             iter = iter + 1
@@ -367,8 +363,8 @@ Program main
             terminate = norm2(opt_cond)
             ! terminate = norm2(xk-xtrial)
 
-            write(*,30)  iter,iter_sub,fxtrial,terminate,m,sum(lambda(:))
-            30 format (2X,I6,10X,I4,6X,ES14.6,4X,ES14.6,6X,I2,5X,F3.1)
+            write(*,30)  iter,iter_sub,fxtrial,terminate,m,sum(lambda(:)),xk(1),xk(2),xk(3)
+            30 format (2X,I6,10X,I4,6X,ES14.6,4X,ES14.6,6X,I2,5X,F3.1,5X,F4.2,4X,F4.2,4X,F4.2)
 
             deallocate(lambda,equatn,linear,grad)
             fxk = fxtrial
@@ -380,7 +376,7 @@ Program main
             call mount_Idelta(faux,delta,q,indices,samples,Idelta,m)
             
         end do ! End of Main Algorithm
-        print*,"-----------------------------------------------------------------------------"
+        print*,"----------------------------------------------------------------------------------------------------"
 
         outliers(:) = int(indices(samples - noutliers + 1:))
         fovo = fxk
