@@ -1,4 +1,4 @@
-Program main
+ Program main
     use sort
 
     implicit none 
@@ -80,8 +80,8 @@ Program main
     ! Number of days
     t(:) = data(1,:) ! Initial point
     ! t(:) = data(5,:) ! Midpoint
-    inf = 4
-    sup = 4
+    inf = 1
+    sup = 10
 
     allocate(outliers(3*samples*(sup-inf+1)),stat=allocerr)
 
@@ -106,29 +106,34 @@ Program main
         integer,        intent(inout) :: Idelta(samples),outliers(3*samples*(sup-inf+1)),m
         real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),y(samples)
 
-        integer :: noutliers,q,iterations,ind
-        real(kind=8) :: fovo,delta,sigmin,gamma
+        integer :: noutliers,q,iterations,ind,n_eval
+        real(kind=8) :: fovo,delta,sigmin,gamma,start,finish
 
         print*
         Print*, "OVO Algorithm for Measles"
+
         y(:) = data(2,:)
-        ! xk(:) = 1.0d-1
 
         do noutliers = out_inf,out_sup
+            call cpu_time(start)
             q = samples - noutliers
 
             print*
             write(*,1100) "Number of outliers: ",noutliers
-            xk(:) = 1.0d-1
-            ! xk(:) = (/0.197d0,0.287d0,0.021d0/)
+            ! xk(:) = 1.0d-1
+            xk(:) = (/0.197d0,0.287d0,0.021d0/)
 
             ind = 1
             delta = 5.0d-4
             sigmin = 1.0d-1
             gamma = 5.0d0
-        
+            
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial, &
-            delta,sigmin,gamma,outliers(ind:ind+noutliers-1),fovo,iterations)
+            delta,sigmin,gamma,outliers(ind:ind+noutliers-1),fovo,iterations,n_eval)
+
+            call cpu_time(finish)
+            print*, "OVO function evaluations: ", n_eval
+            write(*,1111) "Execution time: ", finish - start
 
             Open(Unit = 100, File = "output/solutions_mixed_measles.txt", ACCESS = "SEQUENTIAL")
             Open(Unit = 300, File = "output/fobj_mixed_measles.txt", ACCESS = "SEQUENTIAL")
@@ -143,16 +148,16 @@ Program main
 
         print*
         Print*, "OVO Algorithm for Mumps"
+
         y(:) = data(3,:)
 
-        xk(:) = 1.0d-1
-
         do noutliers = out_inf,out_sup
+            call cpu_time(start)
             q = samples - noutliers
             print*
             write(*,1100) "Number of outliers: ",noutliers
-            xk(:) = 1.0d-1
-            ! xk(:) = (/0.156d0,0.250d0,0.0d0/)
+            ! xk(:) = 1.0d-1
+            xk(:) = (/0.156d0,0.250d0,0.0d0/)
 
             ind = ind + noutliers
             ! delta = 5.0d-4
@@ -160,7 +165,11 @@ Program main
             ! gamma = 5.0d0
 
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial, &
-            delta,sigmin,gamma,outliers(ind:ind+noutliers-1),fovo,iterations)
+            delta,sigmin,gamma,outliers(ind:ind+noutliers-1),fovo,iterations,n_eval)
+
+            call cpu_time(finish)
+            print*, "OVO function evaluations: ", n_eval
+            write(*,1111) "Execution time: ", finish - start
 
             Open(Unit = 110, File = "output/solutions_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
             Open(Unit = 310, File = "output/fobj_mixed_mumps.txt", ACCESS = "SEQUENTIAL")
@@ -173,16 +182,16 @@ Program main
 
         print*
         Print*, "OVO Algorithm for Rubella"
+
         y(:) = data(4,:)
 
-        xk(:) = 1.0d-1
-
         do noutliers = out_inf,out_sup
+            call cpu_time(start)
             q = samples - noutliers
             print*
             write(*,1100) "Number of outliers: ",noutliers
-            xk(:) = 1.0d-1
-            ! xk(:) = (/0.0628d0,0.178d0,0.020d0/)
+            ! xk(:) = 1.0d-1
+            xk(:) = (/0.0628d0,0.178d0,0.020d0/)
 
             ind = ind + noutliers
 
@@ -191,7 +200,11 @@ Program main
             ! gamma = 2.0d0
 
             call ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial, &
-            delta,sigmin,gamma,outliers(ind:ind+noutliers-1),fovo,iterations)
+            delta,sigmin,gamma,outliers(ind:ind+noutliers-1),fovo,iterations,n_eval)
+
+            call cpu_time(finish)
+            print*, "OVO function evaluations: ", n_eval
+            write(*,1111) "Execution time: ", finish - start
 
             Open(Unit = 120, File = "output/solutions_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
             Open(Unit = 320, File = "output/fobj_mixed_rubella.txt", ACCESS = "SEQUENTIAL")
@@ -210,6 +223,7 @@ Program main
         1000 format (ES12.6,1X,ES12.6,1X,ES12.6)
         1100 format (1X,A20,I2)
         1200 format (I2)
+        1111 format (A16,2X,F4.2)
 
         close(100)
         close(110)
@@ -225,14 +239,14 @@ Program main
     ! MAIN ALGORITHM
     !==============================================================================
     subroutine ovo_algorithm(q,noutliers,t,y,indices,Idelta,samples,m,n,xtrial, &
-                             delta,sigmin,gamma,outliers,fovo,iterations)
+                             delta,sigmin,gamma,outliers,fovo,iterations,n_eval)
         implicit none
 
         integer,        intent(in) :: q,noutliers,samples,n
         real(kind=8),   intent(in) :: t(samples),y(samples),delta,sigmin,gamma
         integer,        intent(inout) :: Idelta(samples),m
         real(kind=8),   intent(inout) :: indices(samples),xtrial(n-1),fovo
-        integer,        intent(inout) :: outliers(noutliers),iterations
+        integer,        intent(inout) :: outliers(noutliers),iterations,n_eval
 
         integer, parameter  :: max_iter = 10000, max_iter_sub = 100, kflag = 2
         integer             :: iter,iter_sub,i,j
@@ -254,16 +268,17 @@ Program main
 
         ! q-Order-Value function 
         fxk = faux(q)
+        n_eval = 1
 
         call mount_Idelta(faux,delta,q,indices,samples,Idelta,m)
 
-        print*,"----------------------------------------------------------------------------------------------------"
-        write(*,10) "Iterations","Inter. Iter.","Objective func.","Optimality cond.","Idelta","Sum LM","x_1","x_2","x_3"
-        10 format (2X,A11,2X,A12,2X,A15,2X,A16,2X,A6,2X,A6,4X,A3,5X,A3,4X,A3)
-        print*,"----------------------------------------------------------------------------------------------------"
+        print*,"-----------------------------------------------------------------------------"
+        write(*,10) "Iterations","Inter. Iter.","Objective func.","Optimality cond.","Idelta","Sum LM"
+        10 format (2X,A11,2X,A12,2X,A15,2X,A16,2X,A6,2X,A6)
+        print*,"-----------------------------------------------------------------------------"
 
-        write(*,20)  0,"-",fxk,"-",m,"-",xk(1),xk(2),xk(3)
-        20 format (7X,I1,13X,A1,6X,ES14.6,12X,A1,11X,I2,6X,A1,6X,F4.2,4X,F4.2,4X,F4.2)
+        write(*,20)  0,"-",fxk,"-",m,"-"
+        20 format (7X,I1,13X,A1,6X,ES14.6,12X,A1,11X,I2,6X,A1)
 
         do
             iter = iter + 1
@@ -330,6 +345,7 @@ Program main
                 call DSORT(faux,indices,samples,kflag)
         
                 fxtrial = faux(q)
+                n_eval = n_eval + 1
         
                 ! Test the sufficient descent condition
                 if (fxtrial .le. (fxk - alpha * norm2(xtrial(1:n-1) - xk(1:n-1))**2)) exit
@@ -363,8 +379,8 @@ Program main
             terminate = norm2(opt_cond)
             ! terminate = norm2(xk-xtrial)
 
-            write(*,30)  iter,iter_sub,fxtrial,terminate,m,sum(lambda(:)),xk(1),xk(2),xk(3)
-            30 format (2X,I6,10X,I4,6X,ES14.6,4X,ES14.6,6X,I2,5X,F3.1,5X,F4.2,4X,F4.2,4X,F4.2)
+            write(*,30)  iter,iter_sub,fxtrial,terminate,m,sum(lambda(:))
+            30 format (2X,I6,10X,I4,6X,ES14.6,4X,ES14.6,6X,I2,5X,F3.1)
 
             deallocate(lambda,equatn,linear,grad)
             fxk = fxtrial
@@ -376,7 +392,7 @@ Program main
             call mount_Idelta(faux,delta,q,indices,samples,Idelta,m)
             
         end do ! End of Main Algorithm
-        print*,"----------------------------------------------------------------------------------------------------"
+        print*,"-----------------------------------------------------------------------------"
 
         outliers(:) = int(indices(samples - noutliers + 1:))
         fovo = fxk
